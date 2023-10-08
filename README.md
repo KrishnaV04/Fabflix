@@ -1,1 +1,1 @@
-Cool project
+Cool project 2
