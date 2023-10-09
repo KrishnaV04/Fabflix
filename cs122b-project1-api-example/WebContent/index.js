@@ -14,7 +14,7 @@
  * @param resultData jsonObject
  */
 function handleMovieResult(resultData) {
-    console.log("handleMovieResult: populating star table from resultData");
+    console.log("handleMovieResult: populating all movies table from resultData");
 
     // Populate the star table
     // Find the empty table body by id "star_table_body"
@@ -36,7 +36,18 @@ function handleMovieResult(resultData) {
         rowHTML += "<th>" + resultData[i]["movie_year"] + "</th>";
         rowHTML += "<th>" + resultData[i]["movie_director"] + "</th>";
         rowHTML += "<th>" + resultData[i]["movie_genres"] + "</th>";
-        rowHTML += "<th>" + resultData[i]["movie_stars"] + "</th>";
+        // Create star hyperlinks for each star
+        let stars = resultData[i]["movie_stars"];
+        rowHTML += "<th>";
+        for (let j = 0; j < stars.length; j++) {
+            const star = stars[j];
+            console.log(star['star_name']);
+            rowHTML += '<a href="single-star.html?id=' + star['star_id'] + '">' + star['star_name'] + '</a>';
+            if (j < stars.length - 1) {
+                rowHTML += ", "; // Add a comma if not the last star
+            }
+        }
+        rowHTML += "</th>";
         rowHTML += "<th>" + resultData[i]["movie_rating"] + "</th>";
         rowHTML += "</tr>";
 
