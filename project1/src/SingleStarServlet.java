@@ -53,8 +53,12 @@ public class SingleStarServlet extends HttpServlet {
             // Get a connection from dataSource
 
             // Construct a query with parameter represented by "?"
-            String query = "SELECT * from stars as s, stars_in_movies as sim, movies as m " +
-                    "where m.id = sim.movieId and sim.starId = s.id and s.id = ?";
+            String query = "SELECT s.id AS star_id, s.name AS star_name, s.birthYear AS star_dob, " +
+                    "m.id AS movie_id, m.title AS movie_title, m.year AS movie_year, m.director AS movie_director " +
+                    "FROM stars s " +
+                    "JOIN stars_in_movies sim ON s.id = sim.starId " +
+                    "JOIN movies m ON sim.movieId = m.id " +
+                    "WHERE s.id = ? ";
 
             // Declare our statement
             PreparedStatement statement = conn.prepareStatement(query);
@@ -71,18 +75,14 @@ public class SingleStarServlet extends HttpServlet {
             // Iterate through each row of rs
             while (rs.next()) {
 
-                String starId = rs.getString("starId");
-                String starName = rs.getString("name");
-                String starDob = rs.getString("birthYear");
+                String starId = rs.getString("star_id");
+                String starName = rs.getString("star_name");
+                String starDob = rs.getString("star_dob");
 
-                if (starDob == null) {
-                    starDob = "N/A";
-                }
-
-                String movieId = rs.getString("movieId");
-                String movieTitle = rs.getString("title");
-                String movieYear = rs.getString("year");
-                String movieDirector = rs.getString("director");
+                String movieId = rs.getString("movie_id");
+                String movieTitle = rs.getString("movie_title");
+                String movieYear = rs.getString("movie_year");
+                String movieDirector = rs.getString("movie_director");
 
                 // Create a JsonObject based on the data we retrieve from rs
 
@@ -94,6 +94,7 @@ public class SingleStarServlet extends HttpServlet {
                 jsonObject.addProperty("movie_title", movieTitle);
                 jsonObject.addProperty("movie_year", movieYear);
                 jsonObject.addProperty("movie_director", movieDirector);
+                jsonObject.addProperty("movie_link", "single-movie.html?id=" + movieId); // Add a hyperlink to movie_title
 
                 jsonArray.add(jsonObject);
             }
@@ -106,6 +107,7 @@ public class SingleStarServlet extends HttpServlet {
             response.setStatus(200);
 
         } catch (Exception e) {
+            e.printStackTrace();
             // Write error message JSON object to output
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
