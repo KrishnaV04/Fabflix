@@ -17,8 +17,8 @@ import java.sql.Statement;
 
 
 // Declaring a WebServlet called StarsServlet, which maps to url "/api/stars"
-@WebServlet(name = "StarsServlet", urlPatterns = "/api/stars")
-public class StarsServlet extends HttpServlet {
+@WebServlet(name = "MoviesServlet", urlPatterns = "/api/movies")
+public class MoviesServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     // Create a dataSource which registered in web.
@@ -26,7 +26,7 @@ public class StarsServlet extends HttpServlet {
 
     public void init(ServletConfig config) {
         try {
-            dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedbexample");
+            dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
         } catch (NamingException e) {
             e.printStackTrace();
         }
@@ -48,7 +48,29 @@ public class StarsServlet extends HttpServlet {
             // Declare our statement
             Statement statement = conn.createStatement();
 
-            String query = "SELECT * from stars";
+            String query = "SELECT m.id, m.title, m.year, m.director,\n" +
+                    "       (SELECT GROUP_CONCAT(DISTINCT g.name)\n" +
+                    "     FROM (\n" +
+                    "         SELECT DISTINCT g.name\n" +
+                    "         FROM genres_in_movies gim\n" +
+                    "         LEFT JOIN genres g ON gim.genreId = g.id\n" +
+                    "         WHERE gim.movieId = m.id\n" +
+                    "         LIMIT 3\n" +
+                    "     ) AS g LIMIT 3) AS genres,\n" +
+                    "       (SELECT GROUP_CONCAT(DISTINCT s.name)\n" +
+                    "     FROM (\n" +
+                    "         SELECT DISTINCT s.name\n" +
+                    "         FROM stars_in_movies sim\n" +
+                    "         LEFT JOIN stars s ON sim.starId = s.id\n" +
+                    "         WHERE sim.movieId = m.id\n" +
+                    "         LIMIT 3\n" +
+                    "     ) AS s LIMIT 3) AS stars,\n" +
+                    "       r.rating\n" +
+                    "FROM movies m\n" +
+                    "JOIN ratings r ON m.id = r.movieId\n" +
+                    "GROUP BY m.id, m.title, m.year, m.director, r.rating\n" +
+                    "ORDER BY r.rating DESC\n" +
+                    "LIMIT 20;\n";
 
             // Perform the query
             ResultSet rs = statement.executeQuery(query);
@@ -57,15 +79,22 @@ public class StarsServlet extends HttpServlet {
 
             // Iterate through each row of rs
             while (rs.next()) {
-                String star_id = rs.getString("id");
-                String star_name = rs.getString("name");
-                String star_dob = rs.getString("birthYear");
+                String movie_id = rs.getString("id");
+                String movie_title = rs.getString("title");
+                int movie_year = rs.getInt("year");
+                String movie_director = rs.getString("director");
+                String movie_genres = rs.getString("genres");
+                String movie_stars = rs.getString("stars");
+                float movie_rating = rs.getFloat("rating");
 
-                // Create a JsonObject based on the data we retrieve from rs
                 JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("star_id", star_id);
-                jsonObject.addProperty("star_name", star_name);
-                jsonObject.addProperty("star_dob", star_dob);
+                jsonObject.addProperty("movie_id", movie_id);
+                jsonObject.addProperty("movie_title", movie_title);
+                jsonObject.addProperty("movie_year", movie_year);
+                jsonObject.addProperty("movie_director", movie_director);
+                jsonObject.addProperty("movie_genres", movie_genres);
+                jsonObject.addProperty("movie_stars", movie_stars);
+                jsonObject.addProperty("movie_rating", movie_rating);
 
                 jsonArray.add(jsonObject);
             }
