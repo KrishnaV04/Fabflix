@@ -9,17 +9,16 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Arrays;
-
 
 // Declaring a WebServlet called MoviesServlet, which maps to url "/api/movies"
-@WebServlet(name = "MoviesServlet", urlPatterns = "/api/movies")
-public class MoviesServlet extends HttpServlet {
+@WebServlet(name = "SingleMovieServlet", urlPatterns = "/api/single-movie")
+public class SingleMovieServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     // Create a dataSource which registered in web.
@@ -40,46 +39,37 @@ public class MoviesServlet extends HttpServlet {
 
         response.setContentType("application/json"); // Response mime type
 
+        String movieId = request.getParameter("id");
+
+        request.getServletContext().log("getting id: " + movieId);
+
         // Output stream to STDOUT
         PrintWriter out = response.getWriter();
 
         // Get a connection from dataSource and let resource manager close the connection after usage.
         try (Connection conn = dataSource.getConnection()) {
 
-            // Declare our statement
-            Statement statement = conn.createStatement();
+            String query = "SELECT m.id, m.title, m.year, m.director, GROUP_CONCAT(DISTINCT g.name) AS genres, " +
+                    "GROUP_CONCAT(DISTINCT CONCAT(s.name, ':', s.id)) AS stars, r.rating " +
+                    "FROM movies m " +
+                    "JOIN ratings r ON m.id = r.movieId " +
+                    "LEFT JOIN genres_in_movies gim ON m.id = gim.movieId " +
+                    "LEFT JOIN genres g ON gim.genreId = g.id " +
+                    "LEFT JOIN stars_in_movies sim ON m.id = sim.movieId " +
+                    "LEFT JOIN stars s ON sim.starId = s.id " +
+                    "WHERE m.id = ? ";
 
-            String query = "SELECT m.id, m.title, m.year, m.director,\n" +
-                    "       (SELECT GROUP_CONCAT(DISTINCT g.name)\n" +
-                    "     FROM (\n" +
-                    "         SELECT DISTINCT g.name\n" +
-                    "         FROM genres_in_movies gim\n" +
-                    "         LEFT JOIN genres g ON gim.genreId = g.id\n" +
-                    "         WHERE gim.movieId = m.id\n" +
-                    "         LIMIT 3\n" +
-                    "     ) AS g LIMIT 3) AS genres,\n" +
-                    "       (SELECT GROUP_CONCAT(DISTINCT CONCAT(s.name, ':', s.id))\n" +
-                    "     FROM (\n" +
-                    "         SELECT DISTINCT s.name, s.id\n" +
-                    "         FROM stars_in_movies sim\n" +
-                    "         LEFT JOIN stars s ON sim.starId = s.id\n" +
-                    "         WHERE sim.movieId = m.id\n" +
-                    "         LIMIT 3\n" +
-                    "     ) AS s LIMIT 3) AS stars,\n" +
-                    "       r.rating\n" +
-                    "FROM movies m\n" +
-                    "JOIN ratings r ON m.id = r.movieId\n" +
-                    "GROUP BY m.id, m.title, m.year, m.director, r.rating\n" +
-                    "ORDER BY r.rating DESC\n" +
-                    "LIMIT 20;\n";
+            // Create a prepared statement
+            PreparedStatement preparedStatement = conn.prepareStatement(query);
+
+            // Set the value for the parameter (movieId)
+            preparedStatement.setString(1, movieId);
 
             // Perform the query
-            ResultSet rs = statement.executeQuery(query);
+            ResultSet rs = preparedStatement.executeQuery();
 
             JsonArray jsonArray = new JsonArray();
-
-            // Iterate through each row of rs
-            while (rs.next()) {
+            if (rs.next()) { // Move the cursor to the first row
                 String movie_id = rs.getString("id");
                 String movie_title = rs.getString("title");
                 int movie_year = rs.getInt("year");
@@ -90,18 +80,15 @@ public class MoviesServlet extends HttpServlet {
                 // Create an array to store star objects
                 JsonArray starsArray = new JsonArray();
 
-                // Split the star names and IDs
+                // Split the star names, IDs, and hyperlinks
                 String[] starData = movie_stars.split(",");
 
                 for (String star : starData) {
                     String[] starInfo = star.trim().split(":");
-
-                    // Check if starInfo has at least two elements before accessing the second element
                     String starName = starInfo[0];
-
                     String starId = starInfo[1];
 
-                    // Create a star object with name and hyperlink
+                    // Create a star object with name, ID, and hyperlink
                     JsonObject starObject = new JsonObject();
                     starObject.addProperty("star_name", starName);
                     starObject.addProperty("star_id", starId);
@@ -109,21 +96,21 @@ public class MoviesServlet extends HttpServlet {
 
                     // Add the star object to the starsArray
                     starsArray.add(starObject);
-
                 }
+
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty("movie_id", movie_id);
                 jsonObject.addProperty("movie_title", movie_title);
                 jsonObject.addProperty("movie_year", movie_year);
                 jsonObject.addProperty("movie_director", movie_director);
                 jsonObject.addProperty("movie_genres", movie_genres);
-                jsonObject.add("movie_stars", starsArray); // Use starsArray to include star names, IDs, and hyperlinks
+                jsonObject.add("movie_stars", starsArray);
                 jsonObject.addProperty("movie_rating", movie_rating);
 
                 jsonArray.add(jsonObject);
             }
             rs.close();
-            statement.close();
+            preparedStatement.close();
 
             // Log to localhost log
             request.getServletContext().log("getting " + jsonArray.size() + " results");
@@ -132,9 +119,9 @@ public class MoviesServlet extends HttpServlet {
             out.write(jsonArray.toString());
             // Set response status to 200 (OK)
             response.setStatus(200);
-
         } catch (Exception e) {
             e.printStackTrace();
+
             // Write error message JSON object to output
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
@@ -145,8 +132,6 @@ public class MoviesServlet extends HttpServlet {
         } finally {
             out.close();
         }
-
         // Always remember to close db connection after usage. Here it's done by try-with-resources
-
     }
 }
