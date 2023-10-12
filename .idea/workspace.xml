@@ -10,9 +10,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="780285f1-ff80-468f-817a-bd901c8c019d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/project1/createtable.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/project1/WebContent/single-star-styles.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/project1/WebContent/styles.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project1/WebContent/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/project1/WebContent/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project1/WebContent/single-star.html" beforeDir="false" afterPath="$PROJECT_DIR$/project1/WebContent/single-star.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -184,7 +186,11 @@
       <updated>1696803335065</updated>
       <workItem from="1696803336060" duration="20108000" />
       <workItem from="1696831316942" duration="1086000" />
-      <workItem from="1696868417315" duration="759000" />
+      <workItem from="1696868417315" duration="1481000" />
+      <workItem from="1696955919291" duration="1211000" />
+      <workItem from="1697040916520" duration="595000" />
+      <workItem from="1697134648072" duration="601000" />
+      <workItem from="1697138865385" duration="1763000" />
     </task>
     <servers />
   </component>
