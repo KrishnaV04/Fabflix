@@ -84,6 +84,10 @@ public class SingleStarServlet extends HttpServlet {
                 String movieYear = rs.getString("movie_year");
                 String movieDirector = rs.getString("movie_director");
 
+                if (starDob == null) {
+                    starDob = "N/A";
+                }
+
                 // Create a JsonObject based on the data we retrieve from rs
 
                 JsonObject jsonObject = new JsonObject();
