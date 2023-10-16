@@ -49,29 +49,7 @@ public class MoviesServlet extends HttpServlet {
             // Declare our statement
             Statement statement = conn.createStatement();
 
-            String query = "SELECT m.id, m.title, m.year, m.director,\n" +
-                    "       (SELECT GROUP_CONCAT(DISTINCT g.name)\n" +
-                    "     FROM (\n" +
-                    "         SELECT g.name\n" +
-                    "         FROM genres_in_movies gim\n" +
-                    "         LEFT JOIN genres g ON gim.genreId = g.id\n" +
-                    "         WHERE gim.movieId = m.id\n" +
-                    "         LIMIT 3\n" +
-                    "     ) AS g) AS genres,\n" +
-                    "       (SELECT GROUP_CONCAT(DISTINCT CONCAT(s.name, ':', s.id))\n" +
-                    "     FROM (\n" +
-                    "         SELECT s.name, s.id\n" +
-                    "         FROM stars_in_movies sim\n" +
-                    "         LEFT JOIN stars s ON sim.starId = s.id\n" +
-                    "         WHERE sim.movieId = m.id\n" +
-                    "         LIMIT 3\n" +
-                    "     ) AS s) AS stars,\n" +
-                    "       r.rating\n" +
-                    "FROM movies m\n" +
-                    "JOIN ratings r ON m.id = r.movieId\n" +
-                    "GROUP BY m.id, m.title, m.year, m.director, r.rating\n" +
-                    "ORDER BY r.rating DESC\n" +
-                    "LIMIT 20;\n";
+            String query = "SELECT m.id, m.title, m.year, m.director, (SELECT GROUP_CONCAT(DISTINCT g.name) FROM genres_in_movies gim RIGHT JOIN genres g ON gim.genreId = g.id WHERE gim.movieId = m.id LIMIT 3) AS genres, (SELECT GROUP_CONCAT( CONCAT(s.name, ':', s.id)) FROM stars_in_movies sim RIGHT JOIN stars s ON sim.starId = s.id WHERE sim.movieId = m.id LIMIT 3) AS stars,  m.rating FROM (SELECT m.id, m.title, m.year, m.director, r.rating FROM ratings r JOIN movies m ON m.id = r.movieId ORDER BY r.rating DESC LIMIT 20) AS m GROUP BY m.id, m.title, m.year, m.director, m.rating ORDER BY m.rating DESC LIMIT 20;";
 
             // Perform the query
             ResultSet rs = statement.executeQuery(query);
