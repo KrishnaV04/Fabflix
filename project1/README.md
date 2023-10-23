@@ -69,9 +69,9 @@ mysql> quit;
 - `StarsServlet.java` is a Java servlet that talks to the database and get the stars. It returns a list of stars in the JSON format. 
 The name of star is generated as a link to Single Star page.
 
-- `index.js` is the main Javascript file that initiates an HTTP GET request to the `StarsServlet`. After the response is returned, `index.js` populates the table using the data it gets.
+- `movies.js` is the main Javascript file that initiates an HTTP GET request to the `StarsServlet`. After the response is returned, `movies.js` populates the table using the data it gets.
 
-- `index.html` is the main HTML file that imports jQuery, Bootstrap, and `index.js`. It also contains the initial skeleton for the table.
+- `index.html` is the main HTML file that imports jQuery, Bootstrap, and `movies.js`. It also contains the initial skeleton for the table.
 
 - `SingleStarServlet.java` is a Java servlet that talks to the database and get information about one Star and all the movie this Star performed. It returns a list of Movies in the JSON format. 
 
