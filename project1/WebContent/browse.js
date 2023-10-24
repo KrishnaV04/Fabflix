@@ -1,7 +1,7 @@
 function populateGenreList(genres) {
     const genreList = jQuery('#genre-list');
     genres.forEach(function(genre) {
-        const link = jQuery('<a>').attr('href', 'movies_list.html?genre=' + genre).text(genre);
+        const link = jQuery('<a>').attr('href', 'movies_list.html?browseGenre=' + genre).text(genre);
         const li = jQuery('<li>').append(link);
         genreList.append(li);
     });
@@ -10,7 +10,7 @@ function populateGenreList(genres) {
 function populateTitleCharList(titleChars) {
     const titleCharList = jQuery('#title-char-list');
     titleChars.forEach(function(titleChar) {
-        const link = jQuery('<a>').attr('href', 'movies_list.html?title=' + titleChar).text(titleChar);
+        const link = jQuery('<a>').attr('href', 'movies_list.html?browseTitle=' + titleChar).text(titleChar);
         const li = jQuery('<li>').append(link);
         titleCharList.append(li);
     });
@@ -18,7 +18,7 @@ function populateTitleCharList(titleChars) {
 
 $.ajax({
     dataType: "json",
-    url: 'getGenres', // Create a new servlet to handle this request
+    url: 'getGenres',
     method: 'GET',
     success: function(data) {
         populateGenreList(data);
@@ -30,7 +30,7 @@ $.ajax({
 
 $.ajax({
     dataType: "json",
-    url: 'getTitleCharacters', // Create a new servlet to handle this request
+    url: 'getTitleCharacters',
     method: 'GET',
     success: function(data) {
         populateTitleCharList(data);

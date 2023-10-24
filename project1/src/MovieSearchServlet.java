@@ -16,8 +16,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-@WebServlet(name = "MovieListTitleServlet", urlPatterns = "/movieListTitle")
-public class MovieListTitleServlet extends HttpServlet {
+@WebServlet(name = "MovieSearchServlet", urlPatterns = "/movieSearch")
+public class MovieSearchServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private DataSource dataSource;
@@ -32,47 +32,72 @@ public class MovieListTitleServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
-
         PrintWriter out = response.getWriter();
 
-        String titleChar = request.getParameter("browseTitle");
+        // Retrieve search parameters from the request
+        String searchTitle = request.getParameter("title");
+        String searchYear = request.getParameter("year");
+        String searchDirector = request.getParameter("director");
+        String searchStar = request.getParameter("star");
 
         try (Connection conn = dataSource.getConnection()) {
-            String query;
-            if ("*".equals(titleChar)) {
-                query = "SELECT title FROM movies WHERE title REGEXP '^[^A-Za-z0-9]';";
-            } else {
-                query = "SELECT title FROM movies WHERE LOWER(title) LIKE ?";
+            String query = "SELECT title FROM movies WHERE 1=1";
+            if (!searchTitle.isEmpty()) {
+                query += " AND title LIKE ?";
+            }
+            if (!searchYear.isEmpty()) {
+                query += " AND year = ?";
+            }
+            if (!searchDirector.isEmpty()) {
+                query += " AND director LIKE ?";
+            }
+            if (!searchStar.isEmpty()) {
+                query += " AND starName LIKE ?";
             }
 
             PreparedStatement statement = conn.prepareStatement(query);
-            if (!"*".equals(titleChar)) {
-                statement.setString(1, titleChar.toLowerCase() + "%");
+            int parameterIndex = 1;
+            if (!searchTitle.isEmpty()) {
+                statement.setString(parameterIndex++, "%" + searchTitle + "%");
+            }
+            if (!searchYear.isEmpty()) {
+                statement.setInt(parameterIndex++, Integer.parseInt(searchYear));
+            }
+            if (!searchDirector.isEmpty()) {
+                statement.setString(parameterIndex++, "%" + searchDirector + "%");
+            }
+            if (!searchStar.isEmpty()) {
+                statement.setString(parameterIndex++, "%" + searchStar + "%");
             }
 
-            ResultSet rs = statement.executeQuery();
+            // Execute the query and retrieve search results
+            ResultSet resultSet = statement.executeQuery();
 
             JsonArray movieList = new JsonArray();
-
-            while (rs.next()) {
-                String title = rs.getString("title");
+            while (resultSet.next()) {
+                String title = resultSet.getString("title");
                 movieList.add(title);
             }
 
             JsonObject jsonResponse = new JsonObject();
             jsonResponse.add("movies", movieList);
+
+            // Write the search results as a JSON response
             out.write(new Gson().toJson(jsonResponse));
-            rs.close();
+
+            resultSet.close();
             statement.close();
         } catch (Exception e) {
             e.printStackTrace();
+            // Write an error message JSON object to the output
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
             out.write(jsonObject.toString());
+
+            // Set the response status to 500 (Internal Server Error)
             response.setStatus(500);
         } finally {
             out.close();
         }
     }
-
 }

@@ -35,7 +35,7 @@ public class MovieListGenreServlet extends HttpServlet {
 
         PrintWriter out = response.getWriter();
 
-        String genre = request.getParameter("genre");
+        String genre = request.getParameter("browseGenres");
 
         try (Connection conn = dataSource.getConnection()) {
             String query = "SELECT title FROM movies m " +
