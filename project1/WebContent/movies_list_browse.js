@@ -1,8 +1,4 @@
-function getQueryParameter(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
-}
-
+// Define a function to populate the movie list based on search or browse results
 function populateMovieList(data) {
     let movieList = jQuery('#movie_list_body');
 
@@ -18,7 +14,7 @@ function populateMovieList(data) {
 
         // Split the stars and take the first three
         const stars = movie['movie_stars'].split(',');
-
+        console.log(stars);
         row.append(jQuery('<td>').html(stars.map(star => {
             const [starName, starId] = star.split(':');
             console.log(starId);
@@ -30,25 +26,35 @@ function populateMovieList(data) {
     });
 }
 
-const searchTitle = getQueryParameter('title');
-const searchYear = getQueryParameter('year');
-const searchDirector = getQueryParameter('director');
-const searchStar = getQueryParameter('star');
+// AJAX request to fetch search or browse results
+const urlParams = new URLSearchParams(window.location.search);
+const browseTitle = urlParams.get('browseTitle');
+const browseGenre = urlParams.get('browseGenre');
 
-const url = 'movieSearch' +
-    '?title=' + searchTitle +
-    '&year=' + searchYear +
-    '&director=' + searchDirector +
-    '&star=' + searchStar;
-
-jQuery.ajax({
-    url: url,
-    method: 'GET',
-    success: function(data) {
-        populateMovieList(data);
-    },
-    error: function() {
-        console.error('Failed to retrieve movie data.');
-    }
-});
-
+if (browseTitle !== null) {
+    // Perform a search and retrieve the movie data
+    const url = 'movieListTitle?browseTitle=' + browseTitle;
+    jQuery.ajax({
+        url: url,
+        method: 'GET',
+        success: function(data) {
+            populateMovieList(data);
+        },
+        error: function() {
+            console.error('Failed to fetch search results.');
+        }
+    });
+} else if (browseGenre !== null) {
+    // Browse by genre and retrieve the movie data
+    const url = 'movieListGenre?browseGenres=' + browseGenre;
+    jQuery.ajax({
+        url: url,
+        method: 'GET',
+        success: function(data) {
+            populateMovieList(data);
+        },
+        error: function() {
+            console.error('Failed to fetch browse results.');
+        }
+    });
+}

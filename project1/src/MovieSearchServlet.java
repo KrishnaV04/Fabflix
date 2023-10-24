@@ -41,7 +41,18 @@ public class MovieSearchServlet extends HttpServlet {
         String searchStar = request.getParameter("star");
 
         try (Connection conn = dataSource.getConnection()) {
-            String query = "SELECT title FROM movies WHERE 1=1";
+            String query = "SELECT m.id, m.title, m.year, m.director," +
+                    "(SELECT GROUP_CONCAT(DISTINCT g.name ORDER BY g.name ASC) FROM ( SELECT DISTINCT g.name FROM genres_in_movies gim RIGHT JOIN genres g ON gim.genreId = g.id WHERE gim.movieId = m.id LIMIT 3 ) AS g)AS genres, " +
+                    "(SELECT GROUP_CONCAT(CONCAT(s.name, ':', s.id) ) FROM (SELECT s.id, s.name, COUNT(sim.movieId) AS stars_played \n" +
+                    "           FROM stars_in_movies sim\n" +
+                    "           JOIN stars s ON sim.starId = s.id \n" +
+                    "           WHERE sim.movieId = m.id \n" +
+                    "           GROUP BY s.id, s.name \n" +
+                    "           ORDER BY stars_played DESC, s.name ASC\n" +
+                    "           LIMIT 3) AS s) AS stars, " +
+                    "m.rating FROM (SELECT m.id, m.title, m.year, m.director, r.rating FROM ratings r JOIN movies m ON m.id = r.movieId ORDER BY r.rating DESC) AS m " +
+                    "WHERE 1=1";
+//            String query = "SELECT title FROM movies WHERE 1=1";
             if (!searchTitle.isEmpty()) {
                 query += " AND title LIKE ?";
             }
@@ -54,6 +65,8 @@ public class MovieSearchServlet extends HttpServlet {
             if (!searchStar.isEmpty()) {
                 query += " AND starName LIKE ?";
             }
+
+            query += " GROUP BY m.id, m.title, m.year, m.director, m.rating ORDER BY m.rating DESC;";
 
             PreparedStatement statement = conn.prepareStatement(query);
             int parameterIndex = 1;
@@ -75,8 +88,15 @@ public class MovieSearchServlet extends HttpServlet {
 
             JsonArray movieList = new JsonArray();
             while (resultSet.next()) {
-                String title = resultSet.getString("title");
-                movieList.add(title);
+                JsonObject movie = new JsonObject();
+                movie.addProperty("movie_id", resultSet.getString("id"));
+                movie.addProperty("movie_title", resultSet.getString("title"));
+                movie.addProperty("movie_year", resultSet.getInt("year"));
+                movie.addProperty("movie_director", resultSet.getString("director"));
+                movie.addProperty("movie_genres", resultSet.getString("genres"));
+                movie.addProperty("movie_stars", resultSet.getString("stars"));
+                movie.addProperty("movie_rating", resultSet.getDouble("rating"));
+                movieList.add(movie);
             }
 
             JsonObject jsonResponse = new JsonObject();
