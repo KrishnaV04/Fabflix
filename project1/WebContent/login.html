@@ -2,27 +2,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- CSS -->
+  <link rel="stylesheet" type="text/css" href="login.css">
+
   <meta charset="UTF-8">
   <title>Login to Fablix</title>
 </head>
 <body>
-<h2>Login to Fablix</h2>
-<!-- Set the method to POST to avoid showing the username/password in the URL
-     The default action is disabled to allow your own implementation. -->
-<form id="login_form" method="post" action="#">
-  <label><b>Username</b></label>
-  <label>
+<div class="login-heading">
+  <h2>Login to Fablix</h2>
+  <!-- Set the method to POST to avoid showing the username/password in the URL
+       The default action is disabled to allow your own implementation. -->
+</div>
+<div id="login_form_container">
+  <form id="login_form" method="post" action="#">
+    <label><b>Username</b></label>
     <input name="username" placeholder="Enter Username" type="text">
-  </label>
-  <br>
-  <label><b>Password</b></label>
-  <label>
+    <br>
+    <label><b>Password</b></label>
     <input name="password" placeholder="Enter Password" type="password">
-  </label>
-  <br>
-  <input type="submit" value="Login">
-</form>
-
+    <br>
+    <input type="submit" value="Login">
+  </form>
+</div>
 <div id="login_error_message"></div>
 
 <!-- include jQuery-->
