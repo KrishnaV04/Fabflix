@@ -1,4 +1,4 @@
-let login_form = $("#login_form");
+let login_form = jQuery("#login_form");
 
 /**
  * Handle the data returned by LoginServlet
@@ -19,7 +19,7 @@ function handleLoginResult(resultDataString) {
         // error messages on <div> with id "login_error_message"
         console.log("show error message");
         console.log(resultDataJson["message"]);
-        $("#login_error_message").text(resultDataJson["message"]);
+        jQuery("#login_error_message").text(resultDataJson["message"]);
     }
 }
 
@@ -36,7 +36,7 @@ function submitLoginForm(formSubmitEvent) {
      */
     formSubmitEvent.preventDefault();
 
-    $.ajax(
+    jQuery.ajax(
         "api/login", {
             method: "POST",
             // Serialize the login form to the data sent by POST request
