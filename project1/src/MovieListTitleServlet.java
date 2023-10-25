@@ -42,13 +42,13 @@ public class MovieListTitleServlet extends HttpServlet {
             if ("*".equals(titleChar)) {
                 query = "SELECT m.id, m.title, m.year, m.director," +
                         "(SELECT GROUP_CONCAT(DISTINCT g.name ORDER BY g.name ASC) FROM ( SELECT DISTINCT g.name FROM genres_in_movies gim RIGHT JOIN genres g ON gim.genreId = g.id WHERE gim.movieId = m.id LIMIT 3 ) AS g)AS genres, " +
-                        "(SELECT GROUP_CONCAT(CONCAT(s.name, ':', s.id) ) FROM (SELECT s.id, s.name, COUNT(sim.movieId) AS stars_played \n" +
-                        "           FROM stars_in_movies sim\n" +
-                        "           JOIN stars s ON sim.starId = s.id \n" +
-                        "           WHERE sim.movieId = m.id \n" +
-                        "           GROUP BY s.id, s.name \n" +
-                        "           ORDER BY stars_played DESC, s.name ASC\n" +
-                        "           LIMIT 3) AS s) AS stars, " +
+                        "(SELECT GROUP_CONCAT(CONCAT(s.name, ':', s.id) )" +
+                        "           FROM ( SELECT s.id, s.name, COUNT(stars_in_movies.movieId) AS count_movies \n" +
+                        "           FROM stars_in_movies JOIN (SELECT stars.id, stars.name FROM stars JOIN stars_in_movies ON stars.id = stars_in_movies.starId WHERE stars_in_movies.movieId = m.id) AS s \n" +
+                        "            ON s.id = stars_in_movies.starId \n" +
+                        "            GROUP BY s.id, s.name \n" +
+                        "            ORDER BY count_movies DESC, s.name ASC \n" +
+                        "            LIMIT 3) AS s) AS stars, "+
                         "m.rating FROM (SELECT m.id, m.title, m.year, m.director, r.rating FROM ratings r JOIN movies m ON m.id = r.movieId ORDER BY r.rating DESC) AS m " +
                         "WHERE m.title REGEXP '^[^A-Za-z0-9]' " +
                         "GROUP BY m.id, m.title, m.year, m.director, m.rating " +
@@ -57,13 +57,13 @@ public class MovieListTitleServlet extends HttpServlet {
             } else {
                 query = "SELECT m.id, m.title, m.year, m.director," +
                         "(SELECT GROUP_CONCAT(DISTINCT g.name ORDER BY g.name ASC) FROM ( SELECT DISTINCT g.name FROM genres_in_movies gim RIGHT JOIN genres g ON gim.genreId = g.id WHERE gim.movieId = m.id LIMIT 3 ) AS g)AS genres, " +
-                        "(SELECT GROUP_CONCAT(CONCAT(s.name, ':', s.id) ) FROM (SELECT s.id, s.name, COUNT(sim.movieId) AS stars_played \n" +
-                        "           FROM stars_in_movies sim\n" +
-                        "           JOIN stars s ON sim.starId = s.id \n" +
-                        "           WHERE sim.movieId = m.id \n" +
-                        "           GROUP BY s.id, s.name \n" +
-                        "           ORDER BY stars_played DESC, s.name ASC\n" +
-                        "           LIMIT 3) AS s) AS stars, " +
+                        "(SELECT GROUP_CONCAT(CONCAT(s.name, ':', s.id) )" +
+                        "           FROM ( SELECT s.id, s.name, COUNT(stars_in_movies.movieId) AS count_movies \n" +
+                        "           FROM stars_in_movies JOIN (SELECT stars.id, stars.name FROM stars JOIN stars_in_movies ON stars.id = stars_in_movies.starId WHERE stars_in_movies.movieId = m.id) AS s \n" +
+                        "            ON s.id = stars_in_movies.starId \n" +
+                        "            GROUP BY s.id, s.name \n" +
+                        "            ORDER BY count_movies DESC, s.name ASC \n" +
+                        "            LIMIT 3) AS s) AS stars, "+
                         "m.rating FROM (SELECT m.id, m.title, m.year, m.director, r.rating FROM ratings r JOIN movies m ON m.id = r.movieId ORDER BY r.rating DESC) AS m " +
                         "WHERE LOWER(m.title) LIKE ?" +
                         "GROUP BY m.id, m.title, m.year, m.director, m.rating " +
