@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Objects;
 
 @WebServlet(name = "MovieSearchServlet", urlPatterns = "/movieSearch")
 public class MovieSearchServlet extends HttpServlet {
@@ -39,6 +40,17 @@ public class MovieSearchServlet extends HttpServlet {
         String searchYear = request.getParameter("year");
         String searchDirector = request.getParameter("director");
         String searchStar = request.getParameter("star");
+
+        // these lines don't work TODO
+        String order = request.getParameter("order");
+        String rating_sort = request.getParameter("rating_sort");
+        String title_sort = request.getParameter("title_sort");
+
+        // however these lines do TODO
+//        String order = "title";
+//        String rating_sort = "asc";
+//        String title_sort = "desc";
+
 
         try (Connection conn = dataSource.getConnection()) {
             String query = "SELECT m.id, m.title, m.year, m.director," +
@@ -66,7 +78,18 @@ public class MovieSearchServlet extends HttpServlet {
                 query += " AND starName LIKE ?";
             }
 
-            query += " GROUP BY m.id, m.title, m.year, m.director, m.rating ORDER BY m.rating DESC;";
+            query += " GROUP BY m.id, m.title, m.year, m.director, m.rating ";
+
+            String sort_query = ""; //m.rating DESC
+
+            // accounting for sorting
+            if ((rating_sort.equals("asc") || rating_sort.equals("desc")) && (title_sort.equals("asc") || title_sort.equals("desc")))
+            {
+                if (order.equals("title"))      {sort_query += "ORDER BY m.title " + title_sort + " , m.rating " + rating_sort;}
+                else if (order.equals("rating")) {sort_query += "ORDER BY m.rating " + rating_sort + " , m.title " + title_sort;}
+            }
+
+            query += sort_query + ";";
 
             PreparedStatement statement = conn.prepareStatement(query);
             int parameterIndex = 1;
@@ -82,6 +105,7 @@ public class MovieSearchServlet extends HttpServlet {
             if (!searchStar.isEmpty()) {
                 statement.setString(parameterIndex++, "%" + searchStar + "%");
             }
+
 
             // Execute the query and retrieve search results
             ResultSet resultSet = statement.executeQuery();

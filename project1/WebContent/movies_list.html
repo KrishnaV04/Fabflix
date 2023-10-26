@@ -1,39 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
+
     <meta charset="UTF-8">
     <title>Movie List</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-<a href="index.html">Fabflix</a>
-<h1>Movie List</h1>
-<!-- Id "movie-list" is useful for jQuery to find the html element with id, class here is mapping to Bootstrap defined class CSS -->
-<table id="movie_list" class="table table-striped">
-    <!-- Create a table header -->
-    <thead>
-    <tr>
-        <!-- Titles of each column-->
-        <th>Title</th>
-        <th>Year</th>
-        <th>Director</th>
-        <th>Genres</th>
-        <th>Stars</th>
-        <th>Rating</th>
-    </tr>
-    </thead>
-    <!-- Table body is left empty here, will be populated with the data retrieved with movies_list_ACTIONS.js -->
-    <!-- Again, id "movie_list_body" is useful for jQuery to find this html element -->
-    <tbody id=movie_list_body></tbody>
-</table>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-<!-- Load jQuery and Bootstrap JS -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-<script src="movies_list_browse.js"></script>
-<script src="movies_list_search.js"></script>
+</head>
+
+
+<body>
+    <a href="index.html">Fabflix</a>
+    <h1>Movie List</h1>
+
+    <div>
+        <label for="sort-options">Sort By:</label>
+        <select id="sort-options">
+            <option value="title-then-rating">Title then Rating</option>
+            <option value="rating-then-title">Rating then Title</option>
+        </select>
+    </div>
+
+    <div>
+        <i id="title_sorting" class="fas fa-sort" data-sort="none"></i> Title
+        <i id="rating_sorting" class="fas fa-sort" data-sort="none"></i> Rating
+    </div>
+
+
+<!-- Id "movie-list" is useful for jQuery to find the html element with id, class here is mapping to Bootstrap defined class CSS -->
+    <table id="movie_list" class="table table-striped">
+        <!-- Create a table header -->
+        <thead>
+        <tr>
+            <!-- Titles of each column-->
+            <th>Title</th>
+            <th>Year</th>
+            <th>Director</th>
+            <th>Genres</th>
+            <th>Stars</th>
+            <th>Rating</th>
+        </tr>
+        </thead>
+        <!-- Table body is left empty here, will be populated with the data retrieved with movies_list_ACTIONS.js -->
+        <!-- Again, id "movie_list_body" is useful for jQuery to find this html element -->
+        <tbody id=movie_list_body></tbody>
+    </table>
+
+    <!-- Load jQuery and Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="movies_list_browse.js"></script>
+    <script src="movies_list_search.js"></script>
+
 </body>
 </html>
