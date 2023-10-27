@@ -35,20 +35,65 @@ const searchYear = getQueryParameter('year');
 const searchDirector = getQueryParameter('director');
 const searchStar = getQueryParameter('star');
 
-const url = 'movieSearch' +
+let order = "title";
+let title_sort = "asc";
+let rating_sort = "desc";
+
+url = 'movieSearch' +
     '?title=' + searchTitle +
     '&year=' + searchYear +
     '&director=' + searchDirector +
-    '&star=' + searchStar;
+    '&star=' + searchStar +
+    "&order=" + order +
+    "&title_sort=" + title_sort +
+    "&rating_sort=" + rating_sort;
 
-jQuery.ajax({
-    url: url,
-    method: 'GET',
-    success: function(data) {
-        populateMovieList(data);
-    },
-    error: function() {
-        console.error('Failed to retrieve movie data.');
-    }
+function makeAjaxCall() {
+
+    jQuery.ajax({
+        url: url,
+        method: 'GET',
+        success: function (data) {
+            populateMovieList(data);
+        },
+        error: function () {
+            console.error('Failed to retrieve movie data.');
+        }
+    });
+}
+
+makeAjaxCall();
+
+jQuery(document).ready(function() {
+    // Event listener for sorting by title
+    jQuery("#title_sorting").on("click", function() {
+        // Toggle sorting direction (asc or desc)
+
+        const sortIcon = $(this);
+        title_sort = sortIcon.data("sort");
+        makeAjaxCall();
+    });
+
+    // Event listener for sorting by rating
+    jQuery("#rating_sorting").on("click", function() {
+        // Toggle sorting direction (asc or desc)
+        const sortIcon = $(this);
+        rating_sort = sortIcon.data("sort");
+        makeAjaxCall();
+
+    });
+
+    // event listener listening to the dropdown
+    jQuery("#sort-options").on("change", function() {
+        const selectedOption = jQuery(this).val();
+
+        if (selectedOption === "title-then-rating") {
+            order = "title"
+
+        } else if (selectedOption === "rating-then-title") {
+            order = "rating"
+        }
+        makeAjaxCall();
+    });
+
 });
-
