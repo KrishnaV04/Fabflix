@@ -41,15 +41,12 @@ public class MovieSearchServlet extends HttpServlet {
         String searchDirector = request.getParameter("director");
         String searchStar = request.getParameter("star");
 
-        // these lines don't work TODO
+        // these lines don't work
         String order = request.getParameter("order");
         String rating_sort = request.getParameter("rating_sort");
         String title_sort = request.getParameter("title_sort");
 
-        // however these lines do TODO
-//        String order = "title";
-//        String rating_sort = "asc";
-//        String title_sort = "desc";
+        //int results_per_page = Integer.parseInt(request.getParameter("results_per_page"));
 
 
         try (Connection conn = dataSource.getConnection()) {
@@ -80,16 +77,19 @@ public class MovieSearchServlet extends HttpServlet {
 
             query += " GROUP BY m.id, m.title, m.year, m.director, m.rating ";
 
-            String sort_query = ""; //m.rating DESC
+            String sort_query = "";
 
             // accounting for sorting
-            if ((rating_sort.equals("asc") || rating_sort.equals("desc")) && (title_sort.equals("asc") || title_sort.equals("desc")))
+            if (("asc".equals(rating_sort) || "desc".equals(rating_sort)) && ("asc".equals(title_sort) || "desc".equals(title_sort)))
             {
-                if (order.equals("title"))      {sort_query += "ORDER BY m.title " + title_sort + " , m.rating " + rating_sort;}
-                else if (order.equals("rating")) {sort_query += "ORDER BY m.rating " + rating_sort + " , m.title " + title_sort;}
-            }
+                System.out.println("reached");
+                if ("title".equals(order))       {sort_query += "ORDER BY m.title " + title_sort + " , m.rating " + rating_sort; System.out.println(sort_query);}
 
-            query += sort_query + ";";
+                else if ("rating".equals(order)) {sort_query += "ORDER BY m.rating " + rating_sort + " , m.title " + title_sort; System.out.println(sort_query);}
+            }
+            query += sort_query + " ;";
+            //query += sort_query + " LIMIT " + results_per_page + " ;";
+
 
             PreparedStatement statement = conn.prepareStatement(query);
             int parameterIndex = 1;

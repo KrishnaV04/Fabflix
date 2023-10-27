@@ -5,6 +5,7 @@ function getQueryParameter(name) {
 
 function populateMovieList(data) {
     let movieList = jQuery('#movie_list_body');
+    movieList.empty();
 
     data.movies.forEach(function(movie) {
         const row = jQuery('<tr>');
@@ -35,20 +36,26 @@ const searchYear = getQueryParameter('year');
 const searchDirector = getQueryParameter('director');
 const searchStar = getQueryParameter('star');
 
+// defaults
 let order = "title";
 let title_sort = "asc";
 let rating_sort = "desc";
-
-url = 'movieSearch' +
-    '?title=' + searchTitle +
-    '&year=' + searchYear +
-    '&director=' + searchDirector +
-    '&star=' + searchStar +
-    "&order=" + order +
-    "&title_sort=" + title_sort +
-    "&rating_sort=" + rating_sort;
+let page_results = 20;
 
 function makeAjaxCall() {
+
+    let url = 'movieSearch' +
+        '?title=' + searchTitle +
+        '&year=' + searchYear +
+        '&director=' + searchDirector +
+        '&star=' + searchStar +
+        "&order=" + order +
+        "&title_sort=" + title_sort +
+        "&rating_sort=" + rating_sort +
+        "&results_per_page=" + page_results;
+
+
+    jQuery('#search-results').empty();
 
     jQuery.ajax({
         url: url,
@@ -70,6 +77,14 @@ jQuery(document).ready(function() {
         // Toggle sorting direction (asc or desc)
 
         const sortIcon = $(this);
+        if (sortIcon.data("sort") === "asc") {
+            sortIcon.removeClass("fa-sort-asc").addClass("fa-sort-desc");
+            sortIcon.data("sort", "desc");
+        } else {
+            sortIcon.removeClass("fa-sort-desc").addClass("fa-sort-asc");
+            sortIcon.data("sort", "asc");
+        }
+
         title_sort = sortIcon.data("sort");
         makeAjaxCall();
     });
@@ -78,6 +93,14 @@ jQuery(document).ready(function() {
     jQuery("#rating_sorting").on("click", function() {
         // Toggle sorting direction (asc or desc)
         const sortIcon = $(this);
+        if (sortIcon.data("sort") === "asc") {
+            sortIcon.removeClass("fa-sort-asc").addClass("fa-sort-desc");
+            sortIcon.data("sort", "desc");
+        } else {
+            sortIcon.removeClass("fa-sort-desc").addClass("fa-sort-asc");
+            sortIcon.data("sort", "asc");
+        }
+
         rating_sort = sortIcon.data("sort");
         makeAjaxCall();
 
@@ -94,6 +117,12 @@ jQuery(document).ready(function() {
             order = "rating"
         }
         makeAjaxCall();
+    });
+
+    //results per page event listener
+    jQuery("#results-per-page").on("change", function() {
+         page_results = jQuery(this).val();
+         makeAjaxCall();
     });
 
 });
