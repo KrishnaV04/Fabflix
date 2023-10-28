@@ -35,7 +35,7 @@ public class MovieListGenreServlet extends HttpServlet {
 
         PrintWriter out = response.getWriter();
 
-        String genre = request.getParameter("browseGenres");
+        String genre = request.getParameter("browseGenre");
         String order = request.getParameter("order");
         String rating_sort = request.getParameter("rating_sort");
         String title_sort = request.getParameter("title_sort");
@@ -78,7 +78,6 @@ public class MovieListGenreServlet extends HttpServlet {
             }
 
             query += " ;";
-            System.out.println(query);
 
             PreparedStatement statement = conn.prepareStatement(query);
             statement.setString(1, genre);

@@ -1,7 +1,16 @@
-function getQueryParameter(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
-}
+const urlParams = new URLSearchParams(window.location.search);
+
+let order = "title";
+let title_sort = "asc";
+let rating_sort = "desc";
+let page_results = 10;
+let page_number = 0;
+let url;
+
+let howToQuery;
+if (urlParams.get('browseTitle') !== null) {howToQuery = 'movieListTitle';}
+else if (urlParams.get('browseGenre') !== null) {howToQuery = 'movieListGenre';}
+else {howToQuery = 'movieSearch';}
 
 function populateMovieList(data) {
     let movieList = jQuery('#movie_list_body');
@@ -22,7 +31,6 @@ function populateMovieList(data) {
 
         row.append(jQuery('<td>').html(stars.map(star => {
             const [starName, starId] = star.split(':');
-            //console.log(starId); // debugging
             return '<a href="single-star.html?id=' + starId + '">' + starName + '</a>';
         }).join(', ')));
 
@@ -30,49 +38,6 @@ function populateMovieList(data) {
         movieList.append(row);
     });
 }
-
-const searchTitle = getQueryParameter('title');
-const searchYear = getQueryParameter('year');
-const searchDirector = getQueryParameter('director');
-const searchStar = getQueryParameter('star');
-
-// defaults
-let order = "title";
-let title_sort = "asc";
-let rating_sort = "desc";
-let page_results = 10;
-let page_number = 0;
-
-function makeAjaxCall() {
-
-    let url = 'movieSearch' +
-        '?title=' + searchTitle +
-        '&year=' + searchYear +
-        '&director=' + searchDirector +
-        '&star=' + searchStar +
-        "&order=" + order +
-        "&title_sort=" + title_sort +
-        "&rating_sort=" + rating_sort +
-        "&results_per_page=" + page_results +
-        "&page_number=" + page_number;
-
-
-    jQuery('#search-results').empty();
-    jQuery('#movie_list_body').empty();
-
-    jQuery.ajax({
-        url: url,
-        method: 'GET',
-        success: function (data) {
-            populateMovieList(data);
-        },
-        error: function () {
-            console.error('Failed to retrieve movie data.');
-        }
-    });
-}
-
-makeAjaxCall();
 
 jQuery(document).ready(function() {
     // Event listener for sorting by title
@@ -124,8 +89,8 @@ jQuery(document).ready(function() {
 
     //results per page event listener
     jQuery("#results-per-page").on("change", function() {
-         page_results = jQuery(this).val();
-         makeAjaxCall();
+        page_results = jQuery(this).val();
+        makeAjaxCall();
     });
 
     jQuery("#prev-button").on("click", function(){
@@ -143,3 +108,29 @@ jQuery(document).ready(function() {
     });
 
 });
+
+function makeAjaxCall() {
+
+    url = howToQuery + window.location.search +
+        "&order=" + order +
+        "&title_sort=" + title_sort +
+        "&rating_sort=" + rating_sort +
+        "&results_per_page=" + page_results +
+        "&page_number=" + page_number;
+
+    console.log(url)
+
+    jQuery.ajax({
+        url: url,
+        method: 'GET',
+        success: function (data) {
+            populateMovieList(data);
+        },
+        error: function () {
+            console.error('Failed to retrieve movie data.');
+        }
+    });
+}
+
+makeAjaxCall();
+
