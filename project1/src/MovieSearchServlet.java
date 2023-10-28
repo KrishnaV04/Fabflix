@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Objects;
 
 @WebServlet(name = "MovieSearchServlet", urlPatterns = "/movieSearch")
 public class MovieSearchServlet extends HttpServlet {
@@ -40,8 +41,26 @@ public class MovieSearchServlet extends HttpServlet {
         String searchDirector = request.getParameter("director");
         String searchStar = request.getParameter("star");
 
+        String order = request.getParameter("order");
+        String rating_sort = request.getParameter("rating_sort");
+        String title_sort = request.getParameter("title_sort");
+        String results_per_page = request.getParameter("results_per_page");
+        String pageNumber = request.getParameter("page_number");
+
+
         try (Connection conn = dataSource.getConnection()) {
-            String query = "SELECT title FROM movies WHERE 1=1";
+            String query = "SELECT m.id, m.title, m.year, m.director," +
+                    "(SELECT GROUP_CONCAT(DISTINCT g.name ORDER BY g.name ASC) FROM ( SELECT DISTINCT g.name FROM genres_in_movies gim RIGHT JOIN genres g ON gim.genreId = g.id WHERE gim.movieId = m.id LIMIT 3 ) AS g)AS genres, " +
+                    "(SELECT GROUP_CONCAT(CONCAT(s.name, ':', s.id) ) \n" +
+                    "           FROM ( SELECT s.id, s.name, COUNT(stars_in_movies.movieId) AS count_movies \n" +
+                    "           FROM stars_in_movies JOIN (SELECT stars.id, stars.name FROM stars JOIN stars_in_movies ON stars.id = stars_in_movies.starId WHERE stars_in_movies.movieId = m.id) AS s \n" +
+                    "            ON s.id = stars_in_movies.starId \n" +
+                    "            GROUP BY s.id, s.name \n" +
+                    "            ORDER BY count_movies DESC, s.name ASC \n" +
+                    "            LIMIT 3) AS s) AS stars, " +
+                    "m.rating FROM (SELECT m.id, m.title, m.year, m.director, r.rating FROM ratings r JOIN movies m ON m.id = r.movieId ORDER BY r.rating DESC) AS m " +
+                    "WHERE 1=1";
+//            String query = "SELECT title FROM movies WHERE 1=1";
             if (!searchTitle.isEmpty()) {
                 query += " AND title LIKE ?";
             }
@@ -54,6 +73,27 @@ public class MovieSearchServlet extends HttpServlet {
             if (!searchStar.isEmpty()) {
                 query += " AND starName LIKE ?";
             }
+
+            query += " GROUP BY m.id, m.title, m.year, m.director, m.rating ";
+
+            // accounting for sorting
+            if (("asc".equals(rating_sort) || "desc".equals(rating_sort)) && ("asc".equals(title_sort) || "desc".equals(title_sort))) {
+                if ("title".equals(order)) {
+                    query += "ORDER BY m.title " + title_sort + " , m.rating " + rating_sort;
+                } else if ("rating".equals(order)) {
+                    query += "ORDER BY m.rating " + rating_sort + " , m.title " + title_sort;
+                }
+            }
+
+            if (results_per_page != null) {
+                query += " LIMIT " + results_per_page;
+                if (pageNumber != null) {
+                    query += " OFFSET " + Integer.parseInt(results_per_page) * Integer.parseInt(pageNumber);
+                }
+            }
+
+            query += " ;";
+
 
             PreparedStatement statement = conn.prepareStatement(query);
             int parameterIndex = 1;
@@ -70,13 +110,21 @@ public class MovieSearchServlet extends HttpServlet {
                 statement.setString(parameterIndex++, "%" + searchStar + "%");
             }
 
+
             // Execute the query and retrieve search results
             ResultSet resultSet = statement.executeQuery();
 
             JsonArray movieList = new JsonArray();
             while (resultSet.next()) {
-                String title = resultSet.getString("title");
-                movieList.add(title);
+                JsonObject movie = new JsonObject();
+                movie.addProperty("movie_id", resultSet.getString("id"));
+                movie.addProperty("movie_title", resultSet.getString("title"));
+                movie.addProperty("movie_year", resultSet.getInt("year"));
+                movie.addProperty("movie_director", resultSet.getString("director"));
+                movie.addProperty("movie_genres", resultSet.getString("genres"));
+                movie.addProperty("movie_stars", resultSet.getString("stars"));
+                movie.addProperty("movie_rating", resultSet.getDouble("rating"));
+                movieList.add(movie);
             }
 
             JsonObject jsonResponse = new JsonObject();

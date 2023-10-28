@@ -4,8 +4,6 @@ jQuery('#search-button').click(function() {
     const searchDirector = jQuery('#search-director').val();
     const searchStar = jQuery('#search-star').val();
 
-    // Clear previous search results
-    jQuery('#search-results').empty();
 
     jQuery.ajax({
         url: 'movieSearch',
