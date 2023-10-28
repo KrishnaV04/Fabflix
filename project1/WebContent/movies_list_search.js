@@ -7,7 +7,7 @@ function populateMovieList(data) {
     let movieList = jQuery('#movie_list_body');
     movieList.empty();
 
-    data.movies.forEach(function(movie) {
+    data.movies.forEach(function (movie) {
         const row = jQuery('<tr>');
         row.append(jQuery('<td>').html('<a href="single-movie.html?id=' + movie['movie_id'] + '">' + movie['movie_title'] + '</a>'));
         row.append(jQuery('<td>').text(movie['movie_year']));
@@ -73,9 +73,9 @@ function makeAjaxCall() {
 
 makeAjaxCall();
 
-jQuery(document).ready(function() {
+jQuery(document).ready(function () {
     // Event listener for sorting by title
-    jQuery("#title_sorting").on("click", function() {
+    jQuery("#title_sorting").on("click", function () {
         // Toggle sorting direction (asc or desc)
 
         const sortIcon = $(this);
@@ -92,7 +92,7 @@ jQuery(document).ready(function() {
     });
 
     // Event listener for sorting by rating
-    jQuery("#rating_sorting").on("click", function() {
+    jQuery("#rating_sorting").on("click", function () {
         // Toggle sorting direction (asc or desc)
         const sortIcon = $(this);
         if (sortIcon.data("sort") === "asc") {
@@ -109,7 +109,7 @@ jQuery(document).ready(function() {
     });
 
     // event listener listening to the dropdown
-    jQuery("#sort-options").on("change", function() {
+    jQuery("#sort-options").on("change", function () {
         const selectedOption = jQuery(this).val();
 
         if (selectedOption === "title-then-rating") {
@@ -122,19 +122,19 @@ jQuery(document).ready(function() {
     });
 
     //results per page event listener
-    jQuery("#results-per-page").on("change", function() {
-         page_results = jQuery(this).val();
-         makeAjaxCall();
+    jQuery("#results-per-page").on("change", function () {
+        page_results = jQuery(this).val();
+        makeAjaxCall();
     });
 
-    jQuery("#prev-button").on("click", function(){
+    jQuery("#prev-button").on("click", function () {
         if (page_number != null && page_number !== 0) {
             page_number -= 1;
             makeAjaxCall();
         }
     });
 
-    jQuery("#next-button").on("click", function(){
+    jQuery("#next-button").on("click", function () {
         if (page_number != null) {
             page_number += 1;
             makeAjaxCall();

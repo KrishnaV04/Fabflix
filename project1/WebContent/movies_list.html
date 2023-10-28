@@ -13,63 +13,63 @@
 
 
 <body>
-    <a href="index.html">Fabflix</a>
-    <h1>Movie List</h1>
+<a href="index.html">Fabflix</a>
+<h1>Movie List</h1>
 
-    <div>
-        <label for="sort-options">Sort By:</label>
-        <select id="sort-options">
-            <option value="title-then-rating">Title then Rating</option>
-            <option value="rating-then-title">Rating then Title</option>
-        </select>
-    </div>
+<div>
+    <label for="sort-options">Sort By:</label>
+    <select id="sort-options">
+        <option value="title-then-rating">Title then Rating</option>
+        <option value="rating-then-title">Rating then Title</option>
+    </select>
+</div>
 
-    <div>
-        <i id="title_sorting" class="fas fa-sort" data-sort="none"></i> Title
-        <i id="rating_sorting" class="fas fa-sort" data-sort="none"></i> Rating
-    </div>
+<div>
+    <i id="title_sorting" class="fas fa-sort" data-sort="none"></i> Title
+    <i id="rating_sorting" class="fas fa-sort" data-sort="none"></i> Rating
+</div>
 
-    <div id="results_per_page">
-        <label for="results-per-page">Results per page:</label>
-        <select id="results-per-page">
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-        </select>
-    </div>
+<div id="results_per_page">
+    <label for="results-per-page">Results per page:</label>
+    <select id="results-per-page">
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+    </select>
+</div>
 
-    <div>
-        <button id="prev-button">Prev</button>
-        <button id="next-button">Next</button>
-    </div>
+<div>
+    <button id="prev-button">Prev</button>
+    <button id="next-button">Next</button>
+</div>
 
 
 <!-- Id "movie-list" is useful for jQuery to find the html element with id, class here is mapping to Bootstrap defined class CSS -->
-    <table id="movie_list" class="table table-striped">
-        <!-- Create a table header -->
-        <thead>
-        <tr>
-            <!-- Titles of each column-->
-            <th>Title</th>
-            <th>Year</th>
-            <th>Director</th>
-            <th>Genres</th>
-            <th>Stars</th>
-            <th>Rating</th>
-        </tr>
-        </thead>
-        <!-- Table body is left empty here, will be populated with the data retrieved with movies_list_ACTIONS.js -->
-        <!-- Again, id "movie_list_body" is useful for jQuery to find this html element -->
-        <tbody id=movie_list_body></tbody>
-    </table>
+<table id="movie_list" class="table table-striped">
+    <!-- Create a table header -->
+    <thead>
+    <tr>
+        <!-- Titles of each column-->
+        <th>Title</th>
+        <th>Year</th>
+        <th>Director</th>
+        <th>Genres</th>
+        <th>Stars</th>
+        <th>Rating</th>
+    </tr>
+    </thead>
+    <!-- Table body is left empty here, will be populated with the data retrieved with movies_list_ACTIONS.js -->
+    <!-- Again, id "movie_list_body" is useful for jQuery to find this html element -->
+    <tbody id=movie_list_body></tbody>
+</table>
 
-    <!-- Load jQuery and Bootstrap JS -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <script src="movies_list_browse.js"></script>
-    <script src="movies_list_search.js"></script>
+<!-- Load jQuery and Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="movies_list_browse.js"></script>
+<script src="movies_list_search.js"></script>
 
 </body>
 </html>

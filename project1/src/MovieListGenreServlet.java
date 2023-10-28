@@ -46,7 +46,7 @@ public class MovieListGenreServlet extends HttpServlet {
                     "            ON s.id = stars_in_movies.starId \n" +
                     "            GROUP BY s.id, s.name \n" +
                     "            ORDER BY count_movies DESC, s.name ASC \n" +
-                    "            LIMIT 3) AS s) AS stars, "+
+                    "            LIMIT 3) AS s) AS stars, " +
                     "m.rating FROM (SELECT m.id, m.title, m.year, m.director, r.rating FROM ratings r JOIN movies m ON m.id = r.movieId ORDER BY r.rating DESC) AS m " +
                     "WHERE m.id IN (\n" +
                     "    SELECT DISTINCT m.id\n" +
