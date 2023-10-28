@@ -81,6 +81,7 @@ public class MovieListTitleServlet extends HttpServlet {
             }
 
             query += " ;";
+            System.out.println(query);
 
 
 

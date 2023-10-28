@@ -22,7 +22,7 @@ function populateMovieList(data) {
 
         row.append(jQuery('<td>').html(stars.map(star => {
             const [starName, starId] = star.split(':');
-            console.log(starId); // debugging
+            //console.log(starId); // debugging
             return '<a href="single-star.html?id=' + starId + '">' + starName + '</a>';
         }).join(', ')));
 
@@ -58,6 +58,7 @@ function makeAjaxCall() {
 
 
     jQuery('#search-results').empty();
+    jQuery('#movie_list_body').empty();
 
     jQuery.ajax({
         url: url,
@@ -113,10 +114,10 @@ jQuery(document).ready(function() {
         const selectedOption = jQuery(this).val();
 
         if (selectedOption === "title-then-rating") {
-            order = "title"
+            order = "title";
 
         } else if (selectedOption === "rating-then-title") {
-            order = "rating"
+            order = "rating";
         }
         makeAjaxCall();
     });

@@ -15,10 +15,8 @@ function populateMovieList(data) {
 
         // Split the stars and take the first three
         const stars = movie['movie_stars'].split(',');
-        console.log(stars);
         row.append(jQuery('<td>').html(stars.map(star => {
             const [starName, starId] = star.split(':');
-            console.log(starId);
             return '<a href="single-star.html?id=' + starId + '">' + starName + '</a>';
         }).join(', ')));
 
@@ -51,9 +49,11 @@ function makeAjaxCall() {
     url += "&title_sort=" + title_sort +
         "&rating_sort=" + rating_sort +
         "&results_per_page=" + page_results +
+        "&order=" + order +
         "&page_number=" + page_number;
 
     jQuery('#search-results').empty();
+    jQuery('#movie_list_body').empty();
 
     jQuery.ajax({
         url: url,
@@ -106,13 +106,12 @@ jQuery(document).ready(function() {
 
     // event listener listening to the dropdown
     jQuery("#sort-options").on("change", function() {
-        const selectedOption = jQuery(this).val();
-
+        let selectedOption = jQuery(this).val();
         if (selectedOption === "title-then-rating") {
-            order = "title"
+            order = "title";
 
         } else if (selectedOption === "rating-then-title") {
-            order = "rating"
+            order = "rating";
         }
         makeAjaxCall();
     });
