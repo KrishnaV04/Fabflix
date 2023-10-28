@@ -41,12 +41,13 @@ public class MovieSearchServlet extends HttpServlet {
         String searchDirector = request.getParameter("director");
         String searchStar = request.getParameter("star");
 
-        // these lines don't work
         String order = request.getParameter("order");
         String rating_sort = request.getParameter("rating_sort");
         String title_sort = request.getParameter("title_sort");
+        String results_per_page = request.getParameter("results_per_page");
+        String pageNumber = request.getParameter("page_number");
 
-        //int results_per_page = Integer.parseInt(request.getParameter("results_per_page"));
+
 
 
         try (Connection conn = dataSource.getConnection()) {
@@ -77,18 +78,23 @@ public class MovieSearchServlet extends HttpServlet {
 
             query += " GROUP BY m.id, m.title, m.year, m.director, m.rating ";
 
-            String sort_query = "";
-
             // accounting for sorting
-            if (("asc".equals(rating_sort) || "desc".equals(rating_sort)) && ("asc".equals(title_sort) || "desc".equals(title_sort)))
-            {
-                System.out.println("reached");
-                if ("title".equals(order))       {sort_query += "ORDER BY m.title " + title_sort + " , m.rating " + rating_sort; System.out.println(sort_query);}
-
-                else if ("rating".equals(order)) {sort_query += "ORDER BY m.rating " + rating_sort + " , m.title " + title_sort; System.out.println(sort_query);}
+            if (("asc".equals(rating_sort) || "desc".equals(rating_sort)) && ("asc".equals(title_sort) || "desc".equals(title_sort))) {
+                if ("title".equals(order)) {
+                    query += "ORDER BY m.title " + title_sort + " , m.rating " + rating_sort;
+                } else if ("rating".equals(order)) {
+                    query += "ORDER BY m.rating " + rating_sort + " , m.title " + title_sort;
+                }
             }
-            query += sort_query + " ;";
-            //query += sort_query + " LIMIT " + results_per_page + " ;";
+
+            if (results_per_page != null) {
+                query += " LIMIT " + results_per_page;
+                if (pageNumber != null) {
+                    query += " OFFSET " + Integer.parseInt(results_per_page) * Integer.parseInt(pageNumber);
+                }
+            }
+
+            query += " ;";
 
 
             PreparedStatement statement = conn.prepareStatement(query);

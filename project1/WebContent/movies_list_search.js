@@ -22,7 +22,7 @@ function populateMovieList(data) {
 
         row.append(jQuery('<td>').html(stars.map(star => {
             const [starName, starId] = star.split(':');
-            console.log(starId);
+            console.log(starId); // debugging
             return '<a href="single-star.html?id=' + starId + '">' + starName + '</a>';
         }).join(', ')));
 
@@ -40,7 +40,8 @@ const searchStar = getQueryParameter('star');
 let order = "title";
 let title_sort = "asc";
 let rating_sort = "desc";
-let page_results = 20;
+let page_results = 10;
+let page_number = 0;
 
 function makeAjaxCall() {
 
@@ -52,7 +53,8 @@ function makeAjaxCall() {
         "&order=" + order +
         "&title_sort=" + title_sort +
         "&rating_sort=" + rating_sort +
-        "&results_per_page=" + page_results;
+        "&results_per_page=" + page_results +
+        "&page_number=" + page_number;
 
 
     jQuery('#search-results').empty();
@@ -123,6 +125,20 @@ jQuery(document).ready(function() {
     jQuery("#results-per-page").on("change", function() {
          page_results = jQuery(this).val();
          makeAjaxCall();
+    });
+
+    jQuery("#prev-button").on("click", function(){
+        if (page_number != null && page_number !== 0) {
+            page_number -= 1;
+            makeAjaxCall();
+        }
+    });
+
+    jQuery("#next-button").on("click", function(){
+        if (page_number != null) {
+            page_number += 1;
+            makeAjaxCall();
+        }
     });
 
 });
