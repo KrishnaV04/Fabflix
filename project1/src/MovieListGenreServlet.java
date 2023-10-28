@@ -57,10 +57,6 @@ public class MovieListGenreServlet extends HttpServlet {
                     ")" +
                     "GROUP BY m.id, m.title, m.year, m.director, m.rating " +
                     "ORDER BY m.rating DESC;";
-//            String query = "SELECT title FROM movies m " +
-//                    "JOIN genres_in_movies gm ON m.id = gm.movieId " +
-//                    "JOIN genres g ON gm.genreId = g.id " +
-//                    "WHERE g.name = ?";
 
             PreparedStatement statement = conn.prepareStatement(query);
             statement.setString(1, genre);

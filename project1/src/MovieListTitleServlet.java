@@ -36,6 +36,11 @@ public class MovieListTitleServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         String titleChar = request.getParameter("browseTitle");
+        String order = request.getParameter("order");
+        String rating_sort = request.getParameter("rating_sort");
+        String title_sort = request.getParameter("title_sort");
+        String results_per_page = request.getParameter("results_per_page");
+        String pageNumber = request.getParameter("page_number");
 
         try (Connection conn = dataSource.getConnection()) {
             String query;
@@ -58,8 +63,26 @@ public class MovieListTitleServlet extends HttpServlet {
                     "            LIMIT 3) AS s) AS stars, "+
                     "m.rating FROM (SELECT m.id, m.title, m.year, m.director, r.rating FROM ratings r JOIN movies m ON m.id = r.movieId ORDER BY r.rating DESC) AS m " +
                     "WHERE" + title_char_query +
-                    "GROUP BY m.id, m.title, m.year, m.director, m.rating " +
-                    "ORDER BY m.rating DESC;";
+                    "GROUP BY m.id, m.title, m.year, m.director, m.rating ";
+
+            // accounting for sorting
+            if (("asc".equals(rating_sort) || "desc".equals(rating_sort)) && ("asc".equals(title_sort) || "desc".equals(title_sort))) {
+                if ("title".equals(order)) {
+                    query += "ORDER BY m.title " + title_sort + " , m.rating " + rating_sort;
+                } else if ("rating".equals(order)) {
+                    query += "ORDER BY m.rating " + rating_sort + " , m.title " + title_sort;
+                }
+            }
+            if (results_per_page != null) {
+                query += " LIMIT " + results_per_page;
+                if (pageNumber != null) {
+                    query += " OFFSET " + Integer.parseInt(results_per_page) * Integer.parseInt(pageNumber);
+                }
+            }
+
+            query += " ;";
+
+
 
             PreparedStatement statement = conn.prepareStatement(query);
 

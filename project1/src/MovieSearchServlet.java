@@ -99,11 +99,16 @@ public class MovieSearchServlet extends HttpServlet {
 
             PreparedStatement statement = conn.prepareStatement(query);
             int parameterIndex = 1;
+
             if (!searchTitle.isEmpty()) {
                 statement.setString(parameterIndex++, "%" + searchTitle + "%");
             }
-            if (!searchYear.isEmpty()) {
+            if (!searchYear.equals("null")) {
+                System.out.println(searchYear);
                 statement.setInt(parameterIndex++, Integer.parseInt(searchYear));
+            }
+            else{
+                statement.setInt(parameterIndex++, 2000); // TODO temporary
             }
             if (!searchDirector.isEmpty()) {
                 statement.setString(parameterIndex++, "%" + searchDirector + "%");
@@ -111,7 +116,6 @@ public class MovieSearchServlet extends HttpServlet {
             if (!searchStar.isEmpty()) {
                 statement.setString(parameterIndex++, "%" + searchStar + "%");
             }
-
 
             // Execute the query and retrieve search results
             ResultSet resultSet = statement.executeQuery();
@@ -137,6 +141,7 @@ public class MovieSearchServlet extends HttpServlet {
 
             resultSet.close();
             statement.close();
+
         } catch (Exception e) {
             e.printStackTrace();
             // Write an error message JSON object to the output
