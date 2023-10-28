@@ -48,8 +48,6 @@ public class MovieSearchServlet extends HttpServlet {
         String pageNumber = request.getParameter("page_number");
 
 
-
-
         try (Connection conn = dataSource.getConnection()) {
             String query = "SELECT m.id, m.title, m.year, m.director," +
                     "(SELECT GROUP_CONCAT(DISTINCT g.name ORDER BY g.name ASC) FROM ( SELECT DISTINCT g.name FROM genres_in_movies gim RIGHT JOIN genres g ON gim.genreId = g.id WHERE gim.movieId = m.id LIMIT 3 ) AS g)AS genres, " +
@@ -59,7 +57,7 @@ public class MovieSearchServlet extends HttpServlet {
                     "            ON s.id = stars_in_movies.starId \n" +
                     "            GROUP BY s.id, s.name \n" +
                     "            ORDER BY count_movies DESC, s.name ASC \n" +
-                    "            LIMIT 3) AS s) AS stars, "+
+                    "            LIMIT 3) AS s) AS stars, " +
                     "m.rating FROM (SELECT m.id, m.title, m.year, m.director, r.rating FROM ratings r JOIN movies m ON m.id = r.movieId ORDER BY r.rating DESC) AS m " +
                     "WHERE 1=1";
 //            String query = "SELECT title FROM movies WHERE 1=1";
@@ -99,16 +97,11 @@ public class MovieSearchServlet extends HttpServlet {
 
             PreparedStatement statement = conn.prepareStatement(query);
             int parameterIndex = 1;
-
             if (!searchTitle.isEmpty()) {
                 statement.setString(parameterIndex++, "%" + searchTitle + "%");
             }
-            if (!searchYear.equals("null")) {
-                System.out.println(searchYear);
+            if (!searchYear.isEmpty()) {
                 statement.setInt(parameterIndex++, Integer.parseInt(searchYear));
-            }
-            else{
-                statement.setInt(parameterIndex++, 2000); // TODO temporary
             }
             if (!searchDirector.isEmpty()) {
                 statement.setString(parameterIndex++, "%" + searchDirector + "%");
@@ -116,6 +109,7 @@ public class MovieSearchServlet extends HttpServlet {
             if (!searchStar.isEmpty()) {
                 statement.setString(parameterIndex++, "%" + searchStar + "%");
             }
+
 
             // Execute the query and retrieve search results
             ResultSet resultSet = statement.executeQuery();
@@ -141,7 +135,6 @@ public class MovieSearchServlet extends HttpServlet {
 
             resultSet.close();
             statement.close();
-
         } catch (Exception e) {
             e.printStackTrace();
             // Write an error message JSON object to the output
