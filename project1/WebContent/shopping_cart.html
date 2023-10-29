@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Shopping Cart</title>
+    </head>
+    <body>
+        <a href="index.html">Fabflix</a>
+        <h1>Your Shopping Cart</h1>
+        <table id="cartTable">
+            <tr>
+                <th>Movie Title</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total Price</th>
+                <th>Actions</th>
+            </tr>
+            <!-- Cart items will be dynamically added here from shopping_cart.js -->
+        </table>
+
+        <p>Total Price: <span id="totalPrice">$0.00</span></p>
+
+        <button id="proceedToPayment">Proceed to Payment</button>
+
+        <script src="shopping_cart.js"></script>
+    </body>
+</html>
