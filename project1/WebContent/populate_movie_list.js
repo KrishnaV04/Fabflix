@@ -1,4 +1,4 @@
-const urlParams = new URLSearchParams(window.location.search);
+let urlParams = new URLSearchParams(window.location.search);
 
 let order = "title";
 let title_sort = "asc";
@@ -8,15 +8,6 @@ let page_number = 0;
 let url;
 
 let howToQuery;
-if (urlParams.get('browseTitle') !== null) {
-    howToQuery = 'movieListTitle';
-} else if (urlParams.get('browseGenre') !== null) {
-    howToQuery = 'movieListGenre';
-} else if (urlParams.get('title') !== null || urlParams.get('director') !== null || urlParams.get('year') !== null || urlParams.get('star') !== null){
-    howToQuery = 'movieSearch';
-} else {
-    howToQuery = 'requestDispatch';
-}
 
 function populateMovieList(data) {
     let movieList = jQuery('#movie_list_body');
@@ -117,6 +108,18 @@ jQuery(document).ready(function () {
 });
 
 function makeAjaxCall() {
+
+    urlParams = new URLSearchParams(window.location.search);
+    console.log(urlParams.toString());
+    if (urlParams.get('browseTitle') !== null) {
+        howToQuery = 'movieListTitle';
+    } else if (urlParams.get('browseGenre') !== null) {
+        howToQuery = 'movieListGenre';
+    } else if (urlParams.get('title') !== null || urlParams.get('director') !== null || urlParams.get('year') !== null || urlParams.get('star') !== null){
+        howToQuery = 'movieSearch';
+    } else {
+        howToQuery = 'requestDispatch';
+    }
 
     url = howToQuery + window.location.search + "&" +
         "order=" + order +
