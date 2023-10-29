@@ -64,28 +64,28 @@ local.properties
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff:
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/dictionaries
+project1/.idea/**/workspace.xml
+project1/.idea/**/tasks.xml
+project1/.idea/dictionaries
 
 # Sensitive or high-churn files:
-.idea/**/dataSources/
-.idea/**/dataSources.ids
-.idea/**/dataSources.xml
-.idea/**/dataSources.local.xml
-.idea/**/sqlDataSources.xml
-.idea/**/dynamic.xml
-.idea/**/uiDesigner.xml
+project1/.idea/**/dataSources/
+project1/.idea/**/dataSources.ids
+project1/.idea/**/dataSources.xml
+project1/.idea/**/dataSources.local.xml
+project1/.idea/**/sqlDataSources.xml
+project1/.idea/**/dynamic.xml
+project1/.idea/**/uiDesigner.xml
 
 # Gradle:
-.idea/**/gradle.xml
-.idea/**/libraries
+project1/.idea/**/gradle.xml
+project1/.idea/**/libraries
 
 # CMake
 cmake-build-debug/
 
 # Mongo Explorer plugin:
-.idea/**/mongoSettings.xml
+project1/.idea/**/mongoSettings.xml
 
 ## File-based project format:
 *.iws
@@ -102,7 +102,7 @@ cmake-build-debug/
 atlassian-ide-plugin.xml
 
 # Cursive Clojure plugin
-.idea/replstate.xml
+project1/.idea/replstate.xml
 
 # Ruby plugin and RubyMine
 /.rakeTasks
@@ -122,7 +122,7 @@ fabric.properties
 # *.ipr
 
 # Sonarlint plugin
-.idea/sonarlint
+project1/.idea/sonarlint
 
 ### Java ###
 # Compiled class file
@@ -165,5 +165,5 @@ buildNumber.properties
 # Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
 !/.mvn/wrapper/maven-wrapper.jar
 
-.idea
+project1/.idea
 # End of https://www.gitignore.io/api/java,maven,eclipse,java-web,intellij
