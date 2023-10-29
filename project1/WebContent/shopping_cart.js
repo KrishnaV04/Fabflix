@@ -83,11 +83,16 @@ function updateCartDisplay() {
 }
 
 function proceedToPayment() {
-    const totalPrice = calculateTotalPrice();
-    window.location.href = `payment.html?totalPrice=${totalPrice}`;
+    if (shoppingCart.length > 0) {
+        const totalPrice = calculateTotalPrice();
+        window.location.href = `payment.html?totalPrice=${totalPrice}`;
+    }
 }
 
+// Disable the "Proceed to Payment" button initially
+document.getElementById("proceedToPayment").disabled = true;
 
+// Attach a click event handler to the button
 document.getElementById("proceedToPayment").addEventListener("click", proceedToPayment);
 
 function fetchMovieData() {
@@ -98,7 +103,12 @@ function fetchMovieData() {
         success: function(data) {
             data.forEach(cartItem => {
                 addItemToCart(cartItem);
-            })
+            });
+
+            // Enable the button if the cart is not empty
+            if (shoppingCart.length > 0) {
+                document.getElementById("proceedToPayment").disabled = false;
+            }
         },
         error: function(xhr, status, error) {
             console.error("Error fetching movie data: " + error);
@@ -107,3 +117,4 @@ function fetchMovieData() {
 }
 
 fetchMovieData();
+
