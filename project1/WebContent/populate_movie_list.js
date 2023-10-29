@@ -12,8 +12,10 @@ if (urlParams.get('browseTitle') !== null) {
     howToQuery = 'movieListTitle';
 } else if (urlParams.get('browseGenre') !== null) {
     howToQuery = 'movieListGenre';
-} else {
+} else if (urlParams.get('title') !== null || urlParams.get('director') !== null || urlParams.get('year') !== null || urlParams.get('star') !== null){
     howToQuery = 'movieSearch';
+} else {
+    howToQuery = 'requestDispatch';
 }
 
 function populateMovieList(data) {
@@ -116,12 +118,21 @@ jQuery(document).ready(function () {
 
 function makeAjaxCall() {
 
-    url = howToQuery + window.location.search +
-        "&order=" + order +
+    url = howToQuery + window.location.search + "&" +
+        "order=" + order +
         "&title_sort=" + title_sort +
         "&rating_sort=" + rating_sort +
         "&results_per_page=" + page_results +
         "&page_number=" + page_number;
+
+    if (window.location.search === "") {
+        url = howToQuery + "?" +
+            "order=" + order +
+            "&title_sort=" + title_sort +
+            "&rating_sort=" + rating_sort +
+            "&results_per_page=" + page_results +
+            "&page_number=" + page_number;
+    }
 
     console.log(url);
 
@@ -138,4 +149,3 @@ function makeAjaxCall() {
 }
 
 makeAjaxCall();
-

@@ -1,7 +1,9 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,14 +34,14 @@ public class MovieSearchServlet extends HttpServlet {
         }
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        response.setContentType("application/json");
+
+        System.out.println(request.getQueryString());
 
         HttpSession session = request.getSession();
-        String session_url = (String) session.getAttribute("url");
-        if (session_url == null){}
-        else if (session_url)
+        session.setAttribute("url", request.getQueryString());
 
-        response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
         // Retrieve search parameters from the request

@@ -32,8 +32,12 @@ public class MovieListGenreServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
         response.setContentType("application/json");
+
+        System.out.println(request.getQueryString());
+
+        HttpSession session = request.getSession();
+        session.setAttribute("url", request.getQueryString());
 
         PrintWriter out = response.getWriter();
 
