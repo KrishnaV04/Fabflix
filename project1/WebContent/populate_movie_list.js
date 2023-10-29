@@ -43,7 +43,7 @@ function populateMovieList(data) {
     });
 }
 
-// TODO refactoring event handler when you have time
+// TODO refactoring event handler when have time
 jQuery(document).ready(function () {
     // Event listener for sorting by title
     jQuery("#title_sorting").on("click", function () {
