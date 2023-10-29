@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -32,6 +33,12 @@ public class MovieSearchServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        HttpSession session = request.getSession();
+        String session_url = (String) session.getAttribute("url");
+        if (session_url == null){}
+        else if (session_url)
+
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 

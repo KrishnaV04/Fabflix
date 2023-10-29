@@ -123,7 +123,7 @@ function makeAjaxCall() {
         "&results_per_page=" + page_results +
         "&page_number=" + page_number;
 
-    console.log(url)
+    console.log(url);
 
     jQuery.ajax({
         url: url,
