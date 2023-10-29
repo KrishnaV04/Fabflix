@@ -36,7 +36,21 @@ function handleResult(resultData) {
         rowHTML += "<tr>";
         rowHTML += "<th>" + resultData[i]["movie_year"] + "</th>";
         rowHTML += "<th>" + resultData[i]["movie_director"] + "</th>";
-        rowHTML += "<th>" + resultData[i]["movie_genres"] + "</th>";
+        //rowHTML += "<th>" + resultData[i]["movie_genres"] + "</th>";
+
+        let genres = resultData[i]["movie_genres"];
+
+        rowHTML += "<th>";
+        for (let j = 0; j < genres.length; j++) {
+            const genre = genres[j];
+            console.log(genre['movie_genres']);
+            rowHTML += '<a href="movies_list.html?browseGenre=' + genre['genre_name'] + '">' + genre['genre_name']  + '</a>';
+            if (j < genres.length - 1) {
+                rowHTML += ", ";
+            }
+        }
+        rowHTML += "</th>";
+
         // Create star hyperlinks for each star
         let stars = resultData[i]["movie_stars"];
         rowHTML += "<th>";
@@ -49,6 +63,7 @@ function handleResult(resultData) {
             }
         }
         rowHTML += "</th>";
+
         rowHTML += "<th>" + resultData[i]["movie_rating"] + "</th>";
         rowHTML += "</tr>";
 

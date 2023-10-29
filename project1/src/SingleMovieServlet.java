@@ -77,9 +77,18 @@ public class SingleMovieServlet extends HttpServlet {
                 String movie_genres = rs.getString("genres");
                 String movie_stars = rs.getString("stars");
                 float movie_rating = rs.getFloat("rating");
+
+                System.out.println(movie_genres);
+                JsonArray genreArray = new JsonArray();
+                String[] genreData = movie_genres.split(",");
+                for (String genre: genreData) {
+                    JsonObject genreObj = new JsonObject();
+                    genreObj.addProperty("genre_name", genre);
+                    genreArray.add(genreObj);
+                }
+
                 // Create an array to store star objects
                 JsonArray starsArray = new JsonArray();
-
                 // Split the star names, IDs, and hyperlinks
                 String[] starData = movie_stars.split(",");
 
@@ -103,7 +112,7 @@ public class SingleMovieServlet extends HttpServlet {
                 jsonObject.addProperty("movie_title", movie_title);
                 jsonObject.addProperty("movie_year", movie_year);
                 jsonObject.addProperty("movie_director", movie_director);
-                jsonObject.addProperty("movie_genres", movie_genres);
+                jsonObject.add("movie_genres", genreArray);
                 jsonObject.add("movie_stars", starsArray);
                 jsonObject.addProperty("movie_rating", movie_rating);
 
