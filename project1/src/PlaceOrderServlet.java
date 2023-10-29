@@ -40,6 +40,7 @@ public class PlaceOrderServlet extends HttpServlet {
             boolean paymentSuccessful = verifyPayment(paymentData);
 
             if (paymentSuccessful) {
+                @SuppressWarnings("unchecked")
                 List<JsonObject> cartItems = (List<JsonObject>) request.getSession().getAttribute("cart");
 
                 if (cartItems != null && !cartItems.isEmpty()) {
