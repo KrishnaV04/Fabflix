@@ -1,9 +1,10 @@
 let shoppingCart = [];
+const PRICE = 0.99;
 
 function calculateTotalPrice() {
     let totalPrice = 0;
     shoppingCart.forEach(item => {
-        totalPrice += item.quantity * item.price;
+        totalPrice += item.quantity * PRICE;
     });
     return totalPrice;
 }
@@ -60,10 +61,10 @@ function updateCartDisplay() {
         `;
 
         const priceCell = document.createElement("td");
-        priceCell.textContent = `$${item.price.toFixed(2)}`;
+        priceCell.textContent = `$${PRICE.toFixed(2)}`;
 
         const totalCell = document.createElement("td");
-        totalCell.textContent = `$${(item.quantity * item.price).toFixed(2)}`;
+        totalCell.textContent = `$${(item.quantity * PRICE).toFixed(2)}`;
 
         const actionCell = document.createElement("td");
         actionCell.innerHTML = `<button onclick="removeItemFromCart(${item.id})">Delete</button>`;
@@ -76,7 +77,7 @@ function updateCartDisplay() {
 
         cartTable.appendChild(row);
 
-        totalPrice += item.quantity * item.price;
+        totalPrice += item.quantity * PRICE;
     });
 
     totalPriceSpan.textContent = `$${totalPrice.toFixed(2)}`;

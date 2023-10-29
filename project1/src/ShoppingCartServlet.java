@@ -34,6 +34,7 @@ public class ShoppingCartServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
+        @SuppressWarnings("unchecked")
         ArrayList<JsonObject> cart = (ArrayList<JsonObject>) session.getAttribute("cart");
 
         if (cart == null) {
