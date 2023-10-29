@@ -49,15 +49,27 @@ public class SingleMovieServlet extends HttpServlet {
         // Get a connection from dataSource and let resource manager close the connection after usage.
         try (Connection conn = dataSource.getConnection()) {
 
-            String query = "SELECT m.id, m.title, m.year, m.director, GROUP_CONCAT(DISTINCT g.name) AS genres, " +
-                    "GROUP_CONCAT(CONCAT(s.name, ':', s.id)) AS stars, r.rating " +
+            String query = "SELECT m.id, " +
+                    "m.title, " +
+                    "m.year, " +
+                    "m.director, " +
+                    "GROUP_CONCAT(DISTINCT g.name ORDER BY g.name ASC) AS genres, " +
+                    "(SELECT GROUP_CONCAT(CONCAT(s.name, ':', s.id)) " +
+                    "FROM (SELECT s.id, s.name, COUNT(stars_in_movies.movieId) AS count_movies " +
+                    "FROM stars_in_movies " +
+                    "JOIN (SELECT stars.id, stars.name " +
+                    "FROM stars " +
+                    "JOIN stars_in_movies ON stars.id = stars_in_movies.starId " +
+                    "WHERE stars_in_movies.movieId = m.id) AS s " +
+                    "ON s.id = stars_in_movies.starId " +
+                    "GROUP BY s.id, s.name " +
+                    "ORDER BY count_movies DESC, s.name ASC) AS s) AS stars, " +
+                    "r.rating " +
                     "FROM movies m " +
                     "JOIN ratings r ON m.id = r.movieId " +
                     "LEFT JOIN genres_in_movies gim ON m.id = gim.movieId " +
                     "LEFT JOIN genres g ON gim.genreId = g.id " +
-                    "LEFT JOIN stars_in_movies sim ON m.id = sim.movieId " +
-                    "LEFT JOIN stars s ON sim.starId = s.id " +
-                    "WHERE m.id = ? ";
+                    "WHERE m.id = ?;";
 
             // Create a prepared statement
             PreparedStatement preparedStatement = conn.prepareStatement(query);
