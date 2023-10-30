@@ -12,7 +12,13 @@ jQuery('#search-button').click(function() {
             title: searchTitle,
             year: searchYear,
             director: searchDirector,
-            star: searchStar
+            star: searchStar,
+            order: 'title',
+            title_sort: 'asc',
+            rating_sort: 'desc',
+            page_results: '10',
+            page_number: '0'
+
         },
         success: function(data) {
             if (data) {
@@ -21,7 +27,12 @@ jQuery('#search-button').click(function() {
                     '?title=' + searchTitle +
                     '&year=' + searchYear +
                     '&director=' + searchDirector +
-                    '&star=' + searchStar;
+                    '&star=' + searchStar +
+                    '&order=title' +
+                    '&title_sort=asc' +
+                    '&rating_sort=desc' +
+                    '&page_results=10' +
+                    '&page_number=0';
 
             } else {
                 console.error('Failed to perform the search.');

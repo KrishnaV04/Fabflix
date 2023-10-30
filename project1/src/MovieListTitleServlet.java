@@ -34,18 +34,13 @@ public class MovieListTitleServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
-        System.out.println(request.getQueryString());
-
-        HttpSession session = request.getSession();
-        session.setAttribute("url", request.getQueryString());
-
         PrintWriter out = response.getWriter();
 
         String titleChar = request.getParameter("browseTitle");
         String order = request.getParameter("order");
         String rating_sort = request.getParameter("rating_sort");
         String title_sort = request.getParameter("title_sort");
-        String results_per_page = request.getParameter("results_per_page");
+        String results_per_page = request.getParameter("page_results");
         String pageNumber = request.getParameter("page_number");
 
         try (Connection conn = dataSource.getConnection()) {

@@ -1,10 +1,10 @@
 let urlParams = new URLSearchParams(window.location.search);
 
-let order = "title";
-let title_sort = "asc";
-let rating_sort = "desc";
-let page_results = 10;
-let page_number = 0;
+let order = urlParams.get("order");
+let title_sort = urlParams.get("title_sort");
+let rating_sort = urlParams.get("rating_sort");
+let page_results = parseInt(urlParams.get("page_results"),10);
+let page_number = parseInt(urlParams.get("page_number"),10);
 let url;
 
 let howToQuery;
@@ -36,7 +36,6 @@ function populateMovieList(data) {
     });
 }
 
-// TODO refactoring event handler when have time
 jQuery(document).ready(function () {
     // Event listener for sorting by title
     jQuery("#title_sorting").on("click", function () {
@@ -110,7 +109,17 @@ jQuery(document).ready(function () {
 function makeAjaxCall() {
 
     urlParams = new URLSearchParams(window.location.search);
-    console.log(urlParams.toString());
+    console.log(window.location.search);
+
+    if (howToQuery === 'previousQuery') {
+        console.log("populating with previous numbers")
+        order = urlParams.get("order");
+        title_sort = urlParams.get("title_sort");
+        rating_sort = urlParams.get("rating_sort");
+        page_results = parseInt(urlParams.get("page_results"), 10);
+        page_number = parseInt(urlParams.get("page_number"), 10);
+    }
+
     if (urlParams.get('browseTitle') !== null) {
         howToQuery = 'movieListTitle';
     } else if (urlParams.get('browseGenre') !== null) {
@@ -118,26 +127,24 @@ function makeAjaxCall() {
     } else if (urlParams.get('title') !== null || urlParams.get('director') !== null || urlParams.get('year') !== null || urlParams.get('star') !== null){
         howToQuery = 'movieSearch';
     } else {
-        howToQuery = 'requestDispatch';
+        howToQuery = 'previousQuery';
+        url = sessionStorage.getItem('last_session');
+        console.log("NO");
     }
 
-    url = howToQuery + window.location.search + "&" +
-        "order=" + order +
-        "&title_sort=" + title_sort +
-        "&rating_sort=" + rating_sort +
-        "&results_per_page=" + page_results +
-        "&page_number=" + page_number;
+    urlParams.set("order", order);
+    urlParams.set("title_sort", title_sort);
+    urlParams.set("rating_sort", rating_sort);
+    urlParams.set("page_results", page_results);
+    urlParams.set("page_number", page_number);
 
-    if (window.location.search === "") {
-        url = howToQuery + "?" +
-            "order=" + order +
-            "&title_sort=" + title_sort +
-            "&rating_sort=" + rating_sort +
-            "&results_per_page=" + page_results +
-            "&page_number=" + page_number;
+    if (howToQuery !== 'previousQuery') {
+        url = howToQuery + '?' + urlParams;
     }
+    sessionStorage.setItem('last_session', url);
 
     console.log(url);
+    window.history.pushState(null, null, url);
 
     jQuery.ajax({
         url: url,
