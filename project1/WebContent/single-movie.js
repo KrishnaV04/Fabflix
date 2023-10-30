@@ -26,7 +26,7 @@ function handleResult(resultData) {
         row.append(jQuery('<td>').text(movie['movie_director']));
 
         const genres = movie['movie_genres']
-        row.append(jQuery('<td>').html(genres.map(genre => '<a href="movies_list.html?browseGenre=' + genre + '">' + genre + '</a>').join(', ')));
+        row.append(jQuery('<td>').html(genres.map(genre => '<a href="movies_list.html?browseGenre=' + genre +  '&order=title&title_sort=asc&rating_sort=desc&page_results=10&page_number=0' + '">' + genre + '</a>').join(', ')));
 
         const stars = movie['movie_stars']
         row.append(jQuery('<td>').html(stars.map(star => {

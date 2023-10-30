@@ -90,7 +90,6 @@ public class SingleMovieServlet extends HttpServlet {
                 String movie_stars = rs.getString("stars");
                 float movie_rating = rs.getFloat("rating");
 
-                System.out.println(movie_genres);
                 JsonArray genreArray = new JsonArray();
                 String[] genreData = movie_genres.split(",");
                 for (String genre: genreData) {
