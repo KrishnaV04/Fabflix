@@ -44,7 +44,7 @@ function handleResult(resultData) {
         for (let j = 0; j < genres.length; j++) {
             const genre = genres[j];
             console.log(genre['movie_genres']);
-            rowHTML += '<a href="movies_list.html?browseGenre=' + genre['genre_name'] + '">' + genre['genre_name']  + '</a>';
+            rowHTML += '<a href="movies_list.html?browseGenre=' + genre['genre_name'] + '&order=title&title_sort=asc&rating_sort=desc&page_results=10&page_number=0' + '">' + genre['genre_name']  + '</a>';
             if (j < genres.length - 1) {
                 rowHTML += ", ";
             }

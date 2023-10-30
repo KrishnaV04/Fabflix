@@ -21,7 +21,7 @@ function populateMovieList(data) {
 
         // Split the genres and take the first three
         const genres = movie['movie_genres'].split(',');
-        row.append(jQuery('<td>').html(genres.map(genre => '<a href="movies_list.html?browseGenre=' + genre + '">' + genre + '</a>').join(', ')));
+        row.append(jQuery('<td>').html(genres.map(genre => '<a href="movies_list.html?browseGenre=' + genre + '&order=title&title_sort=asc&rating_sort=desc&page_results=10&page_number=0' + '">' + genre + '</a>').join(', ')));
 
         // Split the stars and take the first three
         const stars = movie['movie_stars'].split(',');
