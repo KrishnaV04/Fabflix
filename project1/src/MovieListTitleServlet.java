@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -39,7 +40,7 @@ public class MovieListTitleServlet extends HttpServlet {
         String order = request.getParameter("order");
         String rating_sort = request.getParameter("rating_sort");
         String title_sort = request.getParameter("title_sort");
-        String results_per_page = request.getParameter("results_per_page");
+        String results_per_page = request.getParameter("page_results");
         String pageNumber = request.getParameter("page_number");
 
         try (Connection conn = dataSource.getConnection()) {
