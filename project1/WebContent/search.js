@@ -43,3 +43,7 @@ jQuery('#search-button').click(function() {
         }
     });
 });
+
+function checkout() {
+    window.location.href = 'shopping_cart.html';
+}

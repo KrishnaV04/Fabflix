@@ -1,73 +1,36 @@
-let shoppingCart = [];
 const PRICE = 0.99;
-
-function calculateTotalPrice() {
-    let totalPrice = 0;
-    shoppingCart.forEach(item => {
-        totalPrice += item.quantity * PRICE;
-    });
-    return totalPrice;
-}
-
-function addItemToCart(movie) {
-    const existingItem = shoppingCart.find(item => item.id === movie.id);
-
-    if (existingItem) {
-        existingItem.quantity++;
-    } else {
-        movie.quantity = 1;
-        shoppingCart.push(movie);
-    }
-
-    updateCartDisplay();
-}
-
-function removeItemFromCart(movieId) {
-    shoppingCart = shoppingCart.filter(item => item.id !== movieId);
-    updateCartDisplay();
-}
-
-function updateItemQuantity(movieId, quantity) {
-    const item = shoppingCart.find(item => item.id === movieId);
-
-    if (item) {
-        item.quantity = quantity;
-        if (item.quantity <= 0) {
-            removeItemFromCart(movieId);
-        }
-        updateCartDisplay();
-    }
-}
-
-function updateCartDisplay() {
-    const cartTable = document.getElementById("cartTable");
+let totalPrice = 0
+function updateCartDisplay(cartData) {
+    const cartBody = document.getElementById("cart_body");
     const totalPriceSpan = document.getElementById("totalPrice");
 
-    cartTable.innerHTML = "";
+    cartBody.innerHTML = "";
+    totalPrice = 0;
 
-    let totalPrice = 0;
-
-    shoppingCart.forEach(item => {
+    cartData.forEach(item => {
         const row = document.createElement("tr");
 
         const titleCell = document.createElement("td");
         titleCell.textContent = item.title;
 
         const quantityCell = document.createElement("td");
+        console.log("IN SHOPPING CART JS");
+        console.log(item.id);
         quantityCell.innerHTML = `
-            <button onclick="updateItemQuantity(${item.id}, ${item.quantity - 1})">-</button>
+            <button onclick="updateItemQuantityInCart('${item.id}', ${item.quantity - 1})">-</button>
             <span>${item.quantity}</span>
-            <button onclick="updateItemQuantity(${item.id}, ${item.quantity + 1})">+</button>
+            <button onclick="updateItemQuantityInCart('${item.id}', ${item.quantity + 1})">+</button>
         `;
 
         const priceCell = document.createElement("td");
         priceCell.textContent = `$${PRICE.toFixed(2)}`;
 
         const totalCell = document.createElement("td");
-        totalCell.textContent = `$${(item.quantity * PRICE).toFixed(2)}`;
+        const itemTotalPrice = (item.quantity * PRICE).toFixed(2);
+        totalCell.textContent = `$${itemTotalPrice}`;
 
         const actionCell = document.createElement("td");
-        actionCell.innerHTML = `<button onclick="removeItemFromCart(${item.id})">Delete</button>`;
+        actionCell.innerHTML = `<button onclick="removeItemFromCart('${item.id}')">Delete</button>`;
 
         row.appendChild(titleCell);
         row.appendChild(quantityCell);
@@ -75,47 +38,85 @@ function updateCartDisplay() {
         row.appendChild(totalCell);
         row.appendChild(actionCell);
 
-        cartTable.appendChild(row);
+        cartBody.appendChild(row);
 
-        totalPrice += item.quantity * PRICE;
+        totalPrice += parseFloat(itemTotalPrice);
     });
+
+    if (cartData.length === 0) {
+        proceedToPaymentButton.disabled = true;
+    } else {
+        proceedToPaymentButton.disabled = false;
+    }
 
     totalPriceSpan.textContent = `$${totalPrice.toFixed(2)}`;
 }
 
 function proceedToPayment() {
-    if (shoppingCart.length > 0) {
-        const totalPrice = calculateTotalPrice();
-        window.location.href = `payment.html?totalPrice=${totalPrice}`;
+    window.location.href = `payment.html?totalPrice=${totalPrice}`;
+}
+
+proceedToPaymentButton = document.getElementById("proceedToPayment")
+proceedToPaymentButton.addEventListener("click", proceedToPayment);
+
+function updateItemQuantityInCart(itemId, newQuantity) {
+    if (newQuantity > 0) {
+        // Send an AJAX request to update the quantity in the shopping cart
+        jQuery.ajax({
+            url: 'api/shopping-cart',
+            method: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({ id: itemId, quantity: newQuantity }),
+            success: function (response) {
+                console.log(response);
+                if (response.success) {
+                    updateCartDisplay(response.cart);
+                } else {
+                    alert('Failed to update item quantity in the shopping cart.');
+                }
+            },
+            error: function () {
+                alert('Error updating item quantity in the shopping cart.');
+            }
+        });
+    } else {
+        alert('You cannot have 0 of one item unless you want to delete it')
     }
 }
 
-// Disable the "Proceed to Payment" button initially
-document.getElementById("proceedToPayment").disabled = true;
+function removeItemFromCart(itemId) {
+    jQuery.ajax({
+        url: 'api/shopping-cart',
+        method: 'DELETE',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({ id: itemId }),
+        success: function (response) {
+            if (response.success) {
+                updateCartDisplay(response.cart);
+            } else {
+                alert('Failed to remove the item from the shopping cart.');
+            }
+        },
+        error: function () {
+            alert('Error removing the item from the shopping cart.');
+        }
+    });
+}
 
-// Attach a click event handler to the button
-document.getElementById("proceedToPayment").addEventListener("click", proceedToPayment);
-
-function fetchMovieData() {
+function fetchCartDataFromBackend() {
     jQuery.ajax({
         url: "api/shopping-cart",
         method: "GET",
         dataType: "json",
         success: function(data) {
-            data.forEach(cartItem => {
-                addItemToCart(cartItem);
-            });
-
-            // Enable the button if the cart is not empty
-            if (shoppingCart.length > 0) {
-                document.getElementById("proceedToPayment").disabled = false;
-            }
+            updateCartDisplay(data);
         },
         error: function(xhr, status, error) {
-            console.error("Error fetching movie data: " + error);
+            console.error("Error fetching cart data: " + error);
         }
     });
 }
 
-fetchMovieData();
-
+fetchCartDataFromBackend();

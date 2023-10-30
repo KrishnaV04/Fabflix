@@ -39,3 +39,7 @@ $.ajax({
         console.error('Failed to fetch title characters.');
     }
 });
+
+function checkout() {
+    window.location.href = 'shopping_cart.html';
+}

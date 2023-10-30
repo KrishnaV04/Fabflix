@@ -14,6 +14,8 @@
 
 <body>
     <a href="index.html">Fabflix</a>
+    <button id="checkoutButton" onclick="checkout()">Checkout</button>
+
     <h1>Movie List</h1>
 
     <div>
@@ -59,7 +61,7 @@
             <th>Rating</th>
         </tr>
         </thead>
-        <!-- Table body is left empty here, will be populated with the data retrieved with movies_list_ACTIONS.js -->
+        <!-- Table body is left empty here, will be populated with the data retrieved with populate_movie_list.js -->
         <!-- Again, id "movie_list_body" is useful for jQuery to find this html element -->
         <tbody id=movie_list_body></tbody>
     </table>

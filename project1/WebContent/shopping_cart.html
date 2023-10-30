@@ -7,6 +7,7 @@
         <a href="index.html">Fabflix</a>
         <h1>Your Shopping Cart</h1>
         <table id="cartTable">
+            <thead>
             <tr>
                 <th>Movie Title</th>
                 <th>Quantity</th>
@@ -14,6 +15,9 @@
                 <th>Total Price</th>
                 <th>Actions</th>
             </tr>
+            </thead>
+
+            <tbody id="cart_body"></tbody>
             <!-- Cart items will be dynamically added here from shopping_cart.js -->
         </table>
 
@@ -21,6 +25,10 @@
 
         <button id="proceedToPayment">Proceed to Payment</button>
 
+        <!-- Load jQuery and Bootstrap JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
         <script src="shopping_cart.js"></script>
     </body>
 </html>

@@ -1,76 +1,52 @@
-// Function to parse URL parameters
 function getParameterByName(target) {
-    // Get request URL
     let url = window.location.href;
-    // Encode target parameter name to url encoding
     target = target.replace(/[\[\]]/g, "\\$&");
 
-    // Ues regular expression to find matched parameter value
     let regex = new RegExp("[?&]" + target + "(=([^&#]*)|&|#|$)"),
         results = regex.exec(url);
     if (!results) return null;
     if (!results[2]) return '';
 
-    // Return the decoded parameter value
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
 function handleResult(resultData) {
-
-    // populate the star info h3
-    // find the empty h3 body by id "star_info"
     let singleMovieInfoElement = jQuery("#single-movie_info");
-
-    // append two html <p> created to the h3 body, which will refresh the page
     singleMovieInfoElement.append("<p>Movie Title: " + resultData[0]["movie_title"] + "</p>");
-
     console.log("handleResult: populating single-movie table from resultData");
 
-    // Populate the star table
-    // Find the empty table body by id "movie_table_body"
     let movieTableBodyElement = jQuery("#single_movie_table_body");
+    console.log(resultData);
 
-    // Concatenate the html tags with resultData jsonObject to create table rows
     for (let i = 0; i < resultData.length; i++) {
-        let rowHTML = "";
-        rowHTML += "<tr>";
-        rowHTML += "<th>" + resultData[i]["movie_year"] + "</th>";
-        rowHTML += "<th>" + resultData[i]["movie_director"] + "</th>";
-        //rowHTML += "<th>" + resultData[i]["movie_genres"] + "</th>";
+        const movie = resultData[i];
 
-        let genres = resultData[i]["movie_genres"];
+        const row = jQuery('<tr>');
+        row.append(jQuery('<td>').text(movie['movie_year']));
+        row.append(jQuery('<td>').text(movie['movie_director']));
 
-        rowHTML += "<th>";
-        for (let j = 0; j < genres.length; j++) {
-            const genre = genres[j];
-            console.log(genre['movie_genres']);
-            rowHTML += '<a href="movies_list.html?browseGenre=' + genre['genre_name'] + '&order=title&title_sort=asc&rating_sort=desc&page_results=10&page_number=0' + '">' + genre['genre_name']  + '</a>';
-            if (j < genres.length - 1) {
-                rowHTML += ", ";
-            }
-        }
-        rowHTML += "</th>";
+        const genres = movie['movie_genres']
+        row.append(jQuery('<td>').html(genres.map(genre => '<a href="movies_list.html?browseGenre=' + genre +  '&order=title&title_sort=asc&rating_sort=desc&page_results=10&page_number=0' + '">' + genre + '</a>').join(', ')));
 
-        // Create star hyperlinks for each star
-        let stars = resultData[i]["movie_stars"];
-        rowHTML += "<th>";
-        for (let j = 0; j < stars.length; j++) {
-            const star = stars[j];
-            console.log(star['star_name']);
-            rowHTML += '<a href="single-star.html?id=' + star['star_id'] + '">' + star['star_name'] + '</a>';
-            if (j < stars.length - 1) {
-                rowHTML += ", "; // Add a comma if not the last star
-            }
-        }
-        rowHTML += "</th>";
+        const stars = movie['movie_stars']
+        row.append(jQuery('<td>').html(stars.map(star => {
+            const starName = star['star_name'];
+            const starId = star['star_id'];
+            return '<a href="single-star.html?id=' + starId + '">' + starName + '</a>';
+        }).join(', ')));
 
-        rowHTML += "<th>" + resultData[i]["movie_rating"] + "</th>";
-        rowHTML += "</tr>";
+        row.append(jQuery('<th>').text(movie['movie_rating']));
 
-        // Append the row created to the table body, which will refresh the page
-        movieTableBodyElement.append(rowHTML);
+        const addToCartButton = jQuery('<button>').text('Add to Shopping Cart');
+        addToCartButton.on('click', function () {
+            addToShoppingCart(movie['movie_id'], movie['movie_title']);
+        });
+        row.append(jQuery('<td>').append(addToCartButton));
+
+        movieTableBodyElement.append(row);
     }
 }
+
 
 // Get the movie ID from the URL
 const movieId = getParameterByName("id");
@@ -83,3 +59,28 @@ jQuery.ajax({
     url: "api/single-movie?id=" + movieId, // Setting request url, which is mapped by StarsServlet in Stars.java
     success: (resultData) => handleResult(resultData) // Setting callback function to handle data returned successfully by the SingleStarServlet
 });
+
+function checkout() {
+    window.location.href = 'shopping_cart.html';
+}
+
+function addToShoppingCart(movieId, movieTitle) {
+    // Send an AJAX request to add the movie to the shopping cart
+    jQuery.ajax({
+        url: 'api/shopping-cart',
+        method: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({ id: movieId, title: movieTitle }),
+        success: function (response) {
+            if (response.success) {
+                alert('Movie added to shopping cart successfully!');
+            } else {
+                alert('Failed to add the movie to the shopping cart.');
+            }
+        },
+        error: function () {
+            alert('Error adding the movie to the shopping cart.');
+        }
+    });
+}
