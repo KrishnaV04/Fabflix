@@ -9,11 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 import java.io.IOException;
@@ -33,13 +29,13 @@ public class PlaceOrderServlet extends HttpServlet {
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            JsonParser parser = new JsonParser();
-            JsonElement jsonData = parser.parse(request.getReader());
+            JsonElement jsonData = JsonConverter.convertInputStreamToJson(request.getReader());
             JsonObject paymentData = jsonData.getAsJsonObject();
 
             boolean paymentSuccessful = verifyPayment(paymentData);
 
             if (paymentSuccessful) {
+                System.out.println("PAYMENT SUCESSFUL!");
                 @SuppressWarnings("unchecked")
                 List<JsonObject> cartItems = (List<JsonObject>) request.getSession().getAttribute("cart");
 
@@ -55,6 +51,7 @@ public class PlaceOrderServlet extends HttpServlet {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 }
             } else {
+                System.out.println("PAYMENT FAILED!");
                 JsonObject errorResponse = new JsonObject();
                 errorResponse.addProperty("success", false);
                 errorResponse.addProperty("message", "Payment information is incorrect.");
@@ -70,11 +67,11 @@ public class PlaceOrderServlet extends HttpServlet {
 
     private boolean verifyPayment(JsonObject paymentData) {
         try (Connection connection = dataSource.getConnection()) {
-
-            String creditCardId = paymentData.get("creditCardId").getAsString();
+            System.out.println("VERIFYING PAYMENT!!");
+            String creditCardId = paymentData.get("creditCard").getAsString();
             String firstName = paymentData.get("firstName").getAsString();
             String lastName = paymentData.get("lastName").getAsString();
-            Date expiration = Date.valueOf(paymentData.get("expiration").getAsString());
+            Date expiration = Date.valueOf(paymentData.get("expirationDate").getAsString());
 
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT id FROM creditcards WHERE id = ? AND firstName = ? AND lastName = ? AND expiration = ?"
@@ -89,7 +86,8 @@ public class PlaceOrderServlet extends HttpServlet {
             boolean paymentMatch = result.next();
 
             statement.close();
-
+            System.out.println("RETURNING THIS FROM VERIFY PAYMENT");
+            System.out.println(paymentMatch);
             return paymentMatch;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -104,21 +102,60 @@ public class PlaceOrderServlet extends HttpServlet {
                     "INSERT INTO sales (customerId, movieId, saleDate) VALUES (?, ?, ?)"
             );
 
-            int customerId = paymentData.get("customerId").getAsInt();
+            String firstName = paymentData.get("firstName").getAsString();
+            String lastName = paymentData.get("lastName").getAsString();
+            String creditCard = paymentData.get("creditCard").getAsString();
 
-            for (JsonObject cartItem : cartItems) {
-                String movieId = cartItem.get("id").getAsString();
-                Date saleDate = new Date(System.currentTimeMillis());
+            PreparedStatement customerIdStatement = connection.prepareStatement("SELECT c.id AS customerId " +
+                    "FROM customers c " +
+                    "JOIN creditcards cc ON c.ccId = cc.id " +
+                    "WHERE c.firstName = ? " +
+                    "AND c.lastName = ? " +
+                    "AND cc.id = ?");
 
-                statement.setInt(1, customerId);
-                statement.setString(2, movieId);
-                statement.setDate(3, saleDate);
-                statement.addBatch();
+            customerIdStatement.setString(1, firstName);
+            customerIdStatement.setString(2, lastName);
+            customerIdStatement.setString(3, creditCard);
+
+            try (ResultSet cutomerIdQueryResultSet = customerIdStatement.executeQuery()) {
+                String customerId = null;
+
+                // Assuming you executed a query to retrieve the customer ID
+                // Replace cutomerIdQueryResultSet with your actual ResultSet object
+                if (cutomerIdQueryResultSet.next()) {
+                    customerId = cutomerIdQueryResultSet.getString("customerId");
+                    System.out.println(customerId);
+                }
+
+                for (JsonObject cartItem : cartItems) {
+                    String movieId = cartItem.get("id").getAsString();
+                    Date saleDate = new Date(System.currentTimeMillis());
+
+                    statement.setString(1, customerId);
+                    statement.setString(2, movieId);
+                    statement.setDate(3, saleDate);
+                    statement.addBatch();
+                }
+                statement.executeBatch();
+
+//                String testQuery = "SELECT * FROM sales WHERE customerId = 658015";
+//                Statement testStatement = connection.createStatement();
+//                ResultSet testResultSet = testStatement.executeQuery(testQuery);
+//                ResultSetMetaData metaData = testResultSet.getMetaData();
+//                int columnCount = metaData.getColumnCount();
+//                while (testResultSet.next()) {
+//                    for (int i = 1; i <= columnCount; i++) {
+//                        String columnName = metaData.getColumnName(i);
+//                        String columnValue = testResultSet.getString(i);
+//                        System.out.println(columnName + ": " + columnValue);
+//                    }
+//                }
+//                testStatement.close();
+//                testResultSet.close();
+
+                statement.close();
             }
 
-            statement.executeBatch();
-
-            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -8,3 +8,7 @@ function browseMovies() {
 
 jQuery("#searchButton").click(searchMovies);
 jQuery("#browseButton").click(browseMovies);
+
+function checkout() {
+    window.location.href = 'shopping_cart.html';
+}

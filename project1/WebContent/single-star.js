@@ -74,6 +74,10 @@ function handleResult(resultData) {
     }
 }
 
+function checkout() {
+    window.location.href = 'shopping_cart.html';
+}
+
 /**
  * Once this .js is loaded, following scripts will be executed by the browser\
  */

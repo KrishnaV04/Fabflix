@@ -1,6 +1,7 @@
 jQuery(document).ready(function() {
     const urlParams = new URLSearchParams(window.location.search);
     const totalPrice = urlParams.get("totalPrice");
+    console.log(totalPrice);
     jQuery("#totalPrice").text("$" + parseFloat(totalPrice).toFixed(2));
     jQuery("#paymentForm").on("submit", function(event) {
         event.preventDefault();
@@ -16,7 +17,6 @@ jQuery(document).ready(function() {
             creditCard: creditCard,
             expirationDate: expirationDate,
             totalPrice: totalPrice,
-            shoppingCart: shoppingCart
         };
 
         jQuery.ajax({
@@ -32,7 +32,7 @@ jQuery(document).ready(function() {
                 }
             },
             error: function(xhr, status, error) {
-                console.error("Error during payment: " + error);
+                alert("Error during payment: PLEASE RE-ENTER PAYMENT INFORMATION");
             }
         });
     });

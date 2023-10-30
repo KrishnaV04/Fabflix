@@ -39,6 +39,16 @@ function populateMovieList(data) {
         }).join(', ')));
 
         row.append(jQuery('<th>').text(movie['movie_rating']));
+
+        // Add an "Add to Shopping Cart" button with a click event handler
+        const addToCartButton = jQuery('<button>').text('Add to Shopping Cart');
+        addToCartButton.on('click', function () {
+            addToShoppingCart(movie['movie_id'], movie['movie_title']);
+        });
+        // console.log("in populate_movies_list")
+        // console.log(movie['movie_id']);
+        row.append(jQuery('<td>').append(addToCartButton));
+
         movieList.append(row);
     });
 }
@@ -113,6 +123,32 @@ jQuery(document).ready(function () {
     });
 
 });
+
+function checkout() {
+    window.location.href = 'shopping_cart.html';
+}
+
+
+function addToShoppingCart(movieId, movieTitle) {
+    // Send an AJAX request to add the movie to the shopping cart
+    jQuery.ajax({
+        url: 'api/shopping-cart',
+        method: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({ id: movieId, title: movieTitle }),
+        success: function (response) {
+            if (response.success) {
+                alert('Movie added to shopping cart successfully!');
+            } else {
+                alert('Failed to add the movie to the shopping cart.');
+            }
+        },
+        error: function () {
+            alert('Error adding the movie to the shopping cart.');
+        }
+    });
+}
 
 function makeAjaxCall() {
 
