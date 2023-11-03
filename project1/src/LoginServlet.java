@@ -8,6 +8,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.io.IOException;
 import javax.sql.DataSource;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,6 +32,21 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         JsonObject responseJsonObject = new JsonObject();
+
+        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+        System.out.println("gRecaptchaResponse=" + gRecaptchaResponse);
+
+        // Verify reCAPTCHA
+        // Reloading reCAPTCHA not a requirement
+        try {
+            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+        } catch (Exception e) {
+            System.out.println("EXCEPTION IN RECAPTCHA!");
+            responseJsonObject.addProperty("status", "fail");
+            responseJsonObject.addProperty("message", "Recaptcha Failed");
+            response.getWriter().write(responseJsonObject.toString());
+            return;
+        }
 
         try (Connection conn = dataSource.getConnection()) {
             String query = "SELECT id FROM customers WHERE email = ? AND password = ?";
