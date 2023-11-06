@@ -165,7 +165,7 @@ function makeAjaxCall() {
     } else {
         howToQuery = 'previousQuery';
         url = sessionStorage.getItem('last_session');
-        console.log("NO");
+        console.log("usingSession");
     }
 
     urlParams.set("order", order);
