@@ -20,6 +20,23 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Objects;
 
+/*
+MYSQL CODE FOR FUTURE:
+SELECT m.id, substring_index(GROUP_CONCAT(g.name, ':', g.id ORDER BY g.name ASC SEPARATOR ','), ',', 3) AS three_genres
+    FROM movies m
+    RIGHT JOIN genres_in_movies gim ON m.id = gim.movieId
+    JOIN genres g ON g.id = gim.genreId
+WHERE m.title LIKE ?
+GROUP BY m.id;
+
+SELECT m.id, substring_index(GROUP_CONCAT(s.name, ':', s.id ORDER BY s.numMovies DESC SEPARATOR ','), ',', 3) as stars
+FROM movies m
+        RIGHT JOIN stars_in_movies sim ON m.id = sim.movieId
+        JOIN stars s ON s.id = sim.starId
+WHERE m.title LIKE '%%'
+GROUP BY m.id;
+ */
+
 @WebServlet(name = "MovieSearchServlet", urlPatterns = "/movieSearch")
 public class MovieSearchServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
