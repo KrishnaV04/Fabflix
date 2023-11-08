@@ -71,7 +71,7 @@ public class MovieSearchServlet extends HttpServlet {
 
         try (Connection conn = dataSource.getConnection()) {
             String query = "SELECT m.id, m.title, m.year, m.director, r.rating,\n" +
-                    "substring_index(GROUP_CONCAT(g.name, ':', g.id ORDER BY g.name ASC SEPARATOR ','), ',', 3) AS three_genres,\n" +
+                    "substring_index(GROUP_CONCAT(g.name ORDER BY g.name ASC SEPARATOR ','), ',', 3) AS three_genres,\n" +
                     "substring_index(GROUP_CONCAT(s.name, ':', s.id ORDER BY s.numMovies DESC SEPARATOR ','), ',', 3) as three_stars\n" +
                     "    FROM movies m\n" +
                     "    JOIN ratings r ON r.movieId = m.id\n" +
@@ -105,7 +105,7 @@ public class MovieSearchServlet extends HttpServlet {
             statement.setString(parameterIndex++, "%" + searchStar + "%");
 
 
-            if (results_per_page == null) {results_per_page = "25";}
+            if (results_per_page == null) {results_per_page = "10";}
             if (pageNumber == null) {pageNumber = "0";}
             statement.setInt(parameterIndex++, Integer.parseInt(results_per_page));
             statement.setInt(parameterIndex++, Integer.parseInt(results_per_page) * Integer.parseInt(pageNumber));
