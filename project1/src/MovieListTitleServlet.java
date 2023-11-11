@@ -74,22 +74,19 @@ public class MovieListTitleServlet extends HttpServlet {
                     query += "ORDER BY m.rating " + rating_sort + " , m.title " + title_sort;
                 }
             }
-            if (results_per_page != null) {
-                query += " LIMIT " + results_per_page;
-                if (pageNumber != null) {
-                    query += " OFFSET " + Integer.parseInt(results_per_page) * Integer.parseInt(pageNumber);
-                }
-            }
 
-            query += " ;";
-
-
+            query += " LIMIT ? OFFSET ? ;";
 
             PreparedStatement statement = conn.prepareStatement(query);
 
             if (!"*".equals(titleChar)) {
                 statement.setString(1, titleChar.toLowerCase() + "%");
             }
+
+            if (results_per_page == null) {results_per_page = "25";}
+            if (pageNumber == null) {pageNumber = "0";}
+            statement.setInt(2, Integer.parseInt(results_per_page));
+            statement.setInt(3, Integer.parseInt(results_per_page) * Integer.parseInt(pageNumber));
 
             ResultSet rs = statement.executeQuery();
 
