@@ -31,7 +31,7 @@ FOR EACH ROW
 BEGIN
     UPDATE stars
     SET numMovies = numMovies+1
-    WHERE id = NEW.starId;
+    WHERE starId = NEW.starId;
 END;
 
 CREATE TABLE IF NOT EXISTS genres (

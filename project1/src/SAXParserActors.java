@@ -25,17 +25,19 @@ public class SAXParserActors extends DefaultHandler {
     private Star currStar;
     private PreparedStatement starInsert;
 
-    private static final String STAR_INSERT_QUERY = "INSERT INTO stars (id, name, birthYear)\n" +
-            "SELECT ?, ?, ?\n" +
-            "FROM dual\n" +
-            "WHERE NOT EXISTS (\n" +
-            "    SELECT 1 FROM stars\n" +
-            "    WHERE name = ?\n" +
-            "    AND (\n" +
-            "        (birthYear = ? AND ? IS NOT NULL)\n" +
-            "        OR (birthYear IS NULL AND ? IS NULL)\n" +
-            "    )\n" +
-            ")\n";
+//    private static final String STAR_INSERT_QUERY = "INSERT INTO stars (id, name, birthYear)\n" +
+//            "SELECT ?, ?, ?\n" +
+//            "FROM dual\n" +
+//            "WHERE NOT EXISTS (\n" +
+//            "    SELECT 1 FROM stars\n" +
+//            "    WHERE name = ?\n" +
+//            "    AND (\n" +
+//            "        (birthYear = ? AND ? IS NOT NULL)\n" +
+//            "        OR (birthYear IS NULL AND ? IS NULL)\n" +
+//            "    )\n" +
+//            ")\n";
+
+    private static final String STAR_INSERT_QUERY = "INSERT INTO stars (id, name, birthYear) VALUES (?, ?, ?)";
 
     private static final String MAX_STAR_ID_QUERY = "SELECT MAX(CAST(SUBSTRING(id, 3) AS SIGNED)) FROM stars";
 
@@ -78,6 +80,34 @@ public class SAXParserActors extends DefaultHandler {
         }
     }
 
+//    private void insertIntoStarsTable(Star star) {
+//        System.out.println("inserting a star: " + star.toString());
+//        try {
+//            if (star.isValid()) {
+//                starInsert.setString(1, star.getId());
+//                starInsert.setString(2, star.getName());
+//                if (star.getBirthYear() == -1) {
+//                    starInsert.setNull(3, java.sql.Types.INTEGER);
+//                    starInsert.setNull(5, java.sql.Types.INTEGER);
+//                    starInsert.setNull(6, java.sql.Types.INTEGER);
+//                    starInsert.setNull(7, java.sql.Types.INTEGER);
+//                } else {
+//                    starInsert.setInt(3, star.getBirthYear());
+//                    starInsert.setInt(5, star.getBirthYear());
+//                    starInsert.setInt(6, star.getBirthYear());
+//                    starInsert.setInt(7, star.getBirthYear());
+//                }
+//                starInsert.setString(4, star.getName());
+//                starInsert.addBatch();
+//                stageNameToId.put(star.getName(), star.getId());
+//            } else {
+//                this.addToInconsistencyFile(star);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
     private void insertIntoStarsTable(Star star) {
         System.out.println("inserting a star: " + star.toString());
         try {
@@ -86,16 +116,9 @@ public class SAXParserActors extends DefaultHandler {
                 starInsert.setString(2, star.getName());
                 if (star.getBirthYear() == -1) {
                     starInsert.setNull(3, java.sql.Types.INTEGER);
-                    starInsert.setNull(5, java.sql.Types.INTEGER);
-                    starInsert.setNull(6, java.sql.Types.INTEGER);
-                    starInsert.setNull(7, java.sql.Types.INTEGER);
                 } else {
                     starInsert.setInt(3, star.getBirthYear());
-                    starInsert.setInt(5, star.getBirthYear());
-                    starInsert.setInt(6, star.getBirthYear());
-                    starInsert.setInt(7, star.getBirthYear());
                 }
-                starInsert.setString(4, star.getName());
                 starInsert.addBatch();
                 stageNameToId.put(star.getName(), star.getId());
             } else {
