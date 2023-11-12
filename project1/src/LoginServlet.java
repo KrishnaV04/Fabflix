@@ -13,6 +13,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import org.jasypt.util.password.StrongPasswordEncryptor;
+
 @WebServlet(name = "LoginServlet", urlPatterns = "/api/login")
 public class LoginServlet extends HttpServlet {
     /**
@@ -49,24 +51,38 @@ public class LoginServlet extends HttpServlet {
         }
 
         try (Connection conn = dataSource.getConnection()) {
-            String query = "SELECT id FROM customers WHERE email = ? AND password = ?";
+            String query = "SELECT id, password FROM customers WHERE email = ?";
             PreparedStatement preparedStatement = conn.prepareStatement(query);
 
             preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password);
+            //preparedStatement.setString(2, password);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
+
+            boolean success = false;
+
             if (resultSet.next()) {
-                // Login success
-                request.getSession().setAttribute("user", new User(username));
-                responseJsonObject.addProperty("status", "success");
-                responseJsonObject.addProperty("message", "success");
+                String encryptedPassword = resultSet.getString("password");
+                success = new StrongPasswordEncryptor().checkPassword(password, encryptedPassword);
+                if(success) {
+                    // Login success
+                    request.getSession().setAttribute("user", new User(username));
+                    responseJsonObject.addProperty("status", "success");
+                    responseJsonObject.addProperty("message", "success");
+                }
+                else {
+                    // Login fail
+                    responseJsonObject.addProperty("status", "fail");
+                    responseJsonObject.addProperty("message", "Incorrect username or password");
+                }
             } else {
                 // Login fail
                 responseJsonObject.addProperty("status", "fail");
                 responseJsonObject.addProperty("message", "Incorrect username or password");
             }
+
+
             resultSet.close();
             preparedStatement.close();
             response.getWriter().write(responseJsonObject.toString());
