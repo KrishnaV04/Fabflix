@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fabflix Metadata</title>
+</head>
+<body>
+
+<a href="../login.html">Fabflix</a>
+
+<h1>Add Star:</h1>
+<div><form id="addstar-form">
+    <input type="text" id="star-name" placeholder="Star's Name">
+    <input type="text" id="star-year" placeholder="Birth Year">
+    <button type="button" id="add-star-button">Add Star</button>
+</form></div>
+
+<h5 id="star_add_msg"></h5>
+
+<h1>Add Movie:</h1>
+<div><form id="addmovie-form">
+    <input type="text" id="movie-title" placeholder="Title">
+    <input type="text" id="movie-year" placeholder="Year">
+    <input type="text" id="movie-director" placeholder="Director">
+    <input type="text" id="movie-star" placeholder="Star's Name">
+    <input type="text" id="movie-genre" placeholder="Genre">
+    <button type="button" id="add-movie-button">Add Movie</button>
+</form></div>
+
+<h5 id="movie_add_msg"></h5>
+
+
+<h1>Metadata Below:</h1>
+
+<!-- Employees Table -->
+<h2>Employees</h2>
+<table>
+    <tr><th>Column Name</th></tr>
+    <tr><td>email</td></tr>
+    <tr><td>password</td></tr>
+    <tr><td>fullname</td></tr>
+</table>
+
+<!-- Movies Table -->
+<h2>Movies</h2>
+<table>
+    <tr><th>Column Name</th></tr>
+    <tr><td>id</td></tr>
+    <tr><td>title</td></tr>
+    <tr><td>year</td></tr>
+    <tr><td>director</td></tr>
+</table>
+
+<!-- Stars Table -->
+<h2>Stars</h2>
+<table>
+    <tr><th>Column Name</th></tr>
+    <tr><td>id</td></tr>
+    <tr><td>name</td></tr>
+    <tr><td>birthYear</td></tr>
+    <tr><td>numMovies</td></tr>
+</table>
+
+<!-- Stars_in_movies Table -->
+<h2>Stars_in_movies</h2>
+<table>
+    <tr><th>Column Name</th></tr>
+    <tr><td>starId</td></tr>
+    <tr><td>movieId</td></tr>
+</table>
+
+<!-- Genres Table -->
+<h2>Genres</h2>
+<table>
+    <tr><th>Column Name</th></tr>
+    <tr><td>id</td></tr>
+    <tr><td>name</td></tr>
+</table>
+
+<!-- Genres_in_movies Table -->
+<h2>Genres_in_movies</h2>
+<table>
+    <tr><th>Column Name</th></tr>
+    <tr><td>genreId</td></tr>
+    <tr><td>movieId</td></tr>
+</table>
+
+<!-- Creditcards Table -->
+<h2>Creditcards</h2>
+<table>
+    <tr><th>Column Name</th></tr>
+    <tr><td>id</td></tr>
+    <tr><td>firstName</td></tr>
+    <tr><td>lastName</td></tr>
+    <tr><td>expiration</td></tr>
+</table>
+
+<!-- Customers Table -->
+<h2>Customers</h2>
+<table>
+    <tr><th>Column Name</th></tr>
+    <tr><td>id</td></tr>
+    <tr><td>firstName</td></tr>
+    <tr><td>lastName</td></tr>
+    <tr><td>ccId</td></tr>
+    <tr><td>address</td></tr>
+    <tr><td>email</td></tr>
+    <tr><td>password</td></tr>
+</table>
+
+<!-- Sales Table -->
+<h2>Sales</h2>
+<table>
+    <tr><th>Column Name</th></tr>
+    <tr><td>id</td></tr>
+    <tr><td>customerId</td></tr>
+    <tr><td>movieId</td></tr>
+    <tr><td>saleDate</td></tr>
+</table>
+
+<!-- Ratings Table -->
+<h2>Ratings</h2>
+<table>
+    <tr><th>Column Name</th></tr>
+    <tr><td>movieId</td></tr>
+    <tr><td>rating</td></tr>
+    <tr><td>numVotes</td></tr>
+</table>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="access_dashboard.js"></script>
+<style>
+    #star_add_msg, #movie_add_msg {
+        color: red;
+    }
+</style>
+</body>
+</html>
