@@ -27,14 +27,19 @@ public class SAXParserMovies extends DefaultHandler {
     private int nextMovieId;
     private PreparedStatement movieInsert;
     private PreparedStatement genreInsert;
+    private PreparedStatement ratingsInsert;
     private PreparedStatement genresInMoviesInsert;
-    private static final String MOVIE_INSERT_QUERY = "INSERT INTO movies (id, title, year, director) " +
-            "SELECT ?, ?, ?, ? " +
-            "FROM dual " +
-            "WHERE NOT EXISTS (" +
-            "    SELECT 1 FROM movies " +
-            "    WHERE title = ? AND year = ? AND director = ?" +
-            ")";
+//    private static final String MOVIE_INSERT_QUERY = "INSERT INTO movies (id, title, year, director) " +
+//            "SELECT ?, ?, ?, ? " +
+//            "FROM dual " +
+//            "WHERE NOT EXISTS (" +
+//            "    SELECT 1 FROM movies " +
+//            "    WHERE title = ? AND year = ? AND director = ?" +
+//            ")";
+
+    private static final String MOVIE_INSERT_QUERY = "INSERT INTO movies (id, title, year, director) VALUES (?, ?, ?, ?)";
+
+    private static final String RATINGS_INSERT_QUERY = "INSERT INTO ratings (movieId, rating, numVotes) VALUES (?, ?, ?)";
 
     private static final String GENRE_INSERT_QUERY = "INSERT INTO genres (name) " +
             "SELECT ? AS name " +
@@ -89,6 +94,7 @@ public class SAXParserMovies extends DefaultHandler {
         try {
             movieInsert = this.connection.prepareStatement(MOVIE_INSERT_QUERY);
             genreInsert = this.connection.prepareStatement(GENRE_INSERT_QUERY);
+            ratingsInsert = this.connection.prepareStatement(RATINGS_INSERT_QUERY);
             genresInMoviesInsert = this.connection.prepareStatement(GENRES_IN_MOVIES_INSERT_QUERY);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -149,6 +155,7 @@ public class SAXParserMovies extends DefaultHandler {
             this.parseDocument();
             movieInsert.executeBatch();
             genreInsert.executeBatch();
+            ratingsInsert.executeBatch();
             genresInMoviesInsert.executeBatch();
         } catch (Exception e) {
             e.printStackTrace();
@@ -156,6 +163,7 @@ public class SAXParserMovies extends DefaultHandler {
             try {
                 movieInsert.close();
                 genreInsert.close();
+                ratingsInsert.close();
                 connection.close();
                 inconsistenciesBufferedWriter.close();
                 inconsistenciesFileWriter.close();
@@ -203,10 +211,24 @@ public class SAXParserMovies extends DefaultHandler {
         }
     }
 
+    private void insertIntoRatingsTable(Movie movie) {
+        try {
+            ratingsInsert.setString(1, movie.getId());
+            ratingsInsert.setFloat(2, movie.getRating());
+            ratingsInsert.setInt(3, 0);
+            ratingsInsert.addBatch();
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+
     private void insertIntoMoviesTable(Movie movie) {
         System.out.println("inserting a movie: " + movie.toString());
         try {
             if (movie.isValid()) {
+                if (movie.getGenres().isEmpty()) {
+                    movie.addGenre("ctxx");
+                }
                 for (String genre : movie.getGenres()) {
                     if (genreCodeToNameMap.containsKey(genre.toLowerCase())) {
                         genre = genreCodeToNameMap.get(genre.toLowerCase());
@@ -218,11 +240,9 @@ public class SAXParserMovies extends DefaultHandler {
                 movieInsert.setString(2, movie.getTitle());
                 movieInsert.setInt(3, movie.getYear());
                 movieInsert.setString(4, movie.getDirector());
-                movieInsert.setString(5, movie.getTitle());
-                movieInsert.setInt(6, movie.getYear());
-                movieInsert.setString(7, movie.getDirector());
                 movieInsert.addBatch();
                 moviesFidToId.put(movie.getFid(), movie.getId());
+                this.insertIntoRatingsTable(movie);
             } else {
                 this.addToInconsistencyFile(movie);
             }

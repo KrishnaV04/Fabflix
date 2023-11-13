@@ -71,7 +71,11 @@ public class MovieSearchServlet extends HttpServlet {
 
         try (Connection conn = dataSource.getConnection()) {
             String query = "SELECT m.id, m.title, m.year, m.director, r.rating,\n" +
-                    "substring_index(GROUP_CONCAT(g.name ORDER BY g.name ASC SEPARATOR ','), ',', 3) AS three_genres,\n" +
+                    "(SELECT GROUP_CONCAT(g.name ORDER BY g.name ASC SEPARATOR ',') \n" +
+            "        FROM genres_in_movies gim\n" +
+                    "        JOIN genres g ON gim.genreId = g.id\n" +
+                    "        WHERE gim.movieId = m.id\n" +
+                    "        LIMIT 3) AS three_genres,\n" +
                     "substring_index(GROUP_CONCAT(s.name, ':', s.id ORDER BY s.numMovies DESC SEPARATOR ','), ',', 3) as three_stars\n" +
                     "    FROM movies m\n" +
                     "    JOIN ratings r ON r.movieId = m.id\n" +
