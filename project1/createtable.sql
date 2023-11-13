@@ -90,10 +90,6 @@ CREATE TABLE IF NOT EXISTS ratings (
     FOREIGN KEY (movieId) REFERENCES movies(id)
 );
 
-CREATE TEMPORARY TABLE IF NOT EXISTS temp_star_counts AS
-SELECT starId, COUNT(*) as movieCount
-FROM stars_in_movies
-GROUP BY starId;
 
 DELIMITER //
 
