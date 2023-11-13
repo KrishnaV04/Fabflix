@@ -65,6 +65,9 @@ public class addMovie extends HttpServlet {
 
             JsonObject responseJson = new JsonObject();
             responseJson.addProperty("success", true);
+            response.setContentType("application/json");
+            response.getWriter().write(responseJson.toString());
+            response.setStatus(HttpServletResponse.SC_OK);
 
         } catch (Exception e) {
             e.printStackTrace();
