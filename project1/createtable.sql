@@ -31,7 +31,7 @@ FOR EACH ROW
 BEGIN
     UPDATE stars
     SET numMovies = numMovies+1
-    WHERE starId = NEW.starId;
+    WHERE id = NEW.starId;
 END;
 
 CREATE TABLE IF NOT EXISTS genres (
@@ -82,3 +82,13 @@ CREATE TABLE IF NOT EXISTS ratings (
     FOREIGN KEY (movieId) REFERENCES movies(id)
 );
 
+DELIMITER //
+
+CREATE PROCEDURE UpdateNumMoviesCount(IN star_id VARCHAR(10))
+BEGIN
+    UPDATE stars
+    SET numMovies = numMovies + 1
+    WHERE id = star_id;
+END//
+
+DELIMITER ;

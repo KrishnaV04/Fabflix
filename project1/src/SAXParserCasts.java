@@ -61,6 +61,7 @@ public class SAXParserCasts extends DefaultHandler {
 //            "    WHERE name = ?" +
 //            ")";
     private static final String STAR_INSERT_QUERY = "INSERT INTO stars (id, name, birthYear) VALUES (?, ?, ?)";
+    private static final String UPDATE_NUM_MOVIES_COUNT = "{call UpdateNumMoviesCount(?)}";
     private static final String XML_PATH = "src/stanford-movies/casts124.xml";
     private static final String DB_CLASS = "com.mysql.cj.jdbc.Driver";
     private static final String DB_URL = "jdbc:mysql://localhost:3306/moviedb";
@@ -111,9 +112,6 @@ public class SAXParserCasts extends DefaultHandler {
 //    }
     private void insertIntoStarsInMoviesTable(CastMember castMember) {
 //        System.out.println("ACTUALLY inserting a castMember: " + castMember.toString());
-        if (Objects.equals(castMember.getStarName(), "Tom Cruise")) {
-            System.out.println("TOM CRUISEY, STAR ID: " + castMember.getStarId());
-        }
         try {
             starsInMoviesInsert.setString(1, castMember.getStarId());
             starsInMoviesInsert.setString(2, castMember.getMovieId());
@@ -122,6 +120,9 @@ public class SAXParserCasts extends DefaultHandler {
     //        starsInMoviesInsert.setString(5, castMember.getStarId());
     //        starsInMoviesInsert.setString(6, castMember.getMovieId());
             starsInMoviesInsert.addBatch();
+            CallableStatement cstmt = connection.prepareCall(UPDATE_NUM_MOVIES_COUNT);
+            cstmt.setString(1, castMember.getStarId());
+            cstmt.execute();
             this.addToInsertionsFile(castMember);
         } catch (SQLException e) {
             e.printStackTrace();

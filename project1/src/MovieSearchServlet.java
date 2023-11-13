@@ -70,95 +70,20 @@ public class MovieSearchServlet extends HttpServlet {
 
 
         try (Connection conn = dataSource.getConnection()) {
-//            String query = "SELECT m.id, m.title, m.year, m.director, r.rating,\n" +
-//                    "substring_index(GROUP_CONCAT(g.name ORDER BY g.name ASC SEPARATOR ','), ',', 3) AS three_genres,\n" +
-//                    "substring_index(GROUP_CONCAT(s.name, ':', s.id ORDER BY s.numMovies DESC SEPARATOR ','), ',', 3) as three_stars\n" +
-//                    "    FROM movies m\n" +
-//                    "    JOIN ratings r ON r.movieId = m.id\n" +
-//                    "    JOIN genres_in_movies gim ON gim.movieId = m.id\n" +
-//                    "    JOIN genres g ON gim.genreId = g.id\n" +
-//                    "    JOIN stars_in_movies sim ON sim.movieId = m.id\n" +
-//                    "    JOIN stars s ON s.id = sim.starId\n" +
-//                    "WHERE m.title LIKE ?";
-//            String query = "SELECT m.id, m.title, m.year, m.director, r.rating,\n" +
-//                    "       (SELECT GROUP_CONCAT(g.name ORDER BY g.name ASC SEPARATOR ',') \n" +
-//                    "        FROM genres_in_movies gim\n" +
-//                    "        JOIN genres g ON gim.genreId = g.id\n" +
-//                    "        WHERE gim.movieId = m.id\n" +
-//                    "        LIMIT 3) AS three_genres,\n" +
-//                    "       (SELECT GROUP_CONCAT(s.name, ':', s.id ORDER BY s.numMovies DESC SEPARATOR ',') \n" +
-//                    "        FROM stars_in_movies sim\n" +
-//                    "        JOIN stars s ON s.id = sim.starId\n" +
-//                    "        WHERE sim.movieId = m.id\n" +
-//                    "        LIMIT 3) AS three_stars\n" +
-//                    "FROM movies m\n" +
-//                    "JOIN ratings r ON r.movieId = m.id\n" +
-//                    "JOIN genres_in_movies gim ON gim.movieId = m.id\n" +
-//                    "JOIN genres g ON gim.genreId = g.id\n" +
-//                    "JOIN stars_in_movies sim ON sim.movieId = m.id\n" +
-//                    "JOIN stars s ON s.id = sim.starId\n" +
-//                    "WHERE m.title LIKE ?";
             String query = "SELECT m.id, m.title, m.year, m.director, r.rating,\n" +
-                    "       (SELECT GROUP_CONCAT(g.name ORDER BY g.name ASC SEPARATOR ',') \n" +
-                    "        FROM genres_in_movies gim\n" +
+                    "(SELECT GROUP_CONCAT(g.name ORDER BY g.name ASC SEPARATOR ',') \n" +
+            "        FROM genres_in_movies gim\n" +
                     "        JOIN genres g ON gim.genreId = g.id\n" +
                     "        WHERE gim.movieId = m.id\n" +
                     "        LIMIT 3) AS three_genres,\n" +
-                    "       (SELECT GROUP_CONCAT(s.name, ':', s.id ORDER BY s.numMovies DESC SEPARATOR ',') \n" +
-                    "    FROM (\n" +
-                    "        SELECT s.name, s.id, s.numMovies\n" +
-                    "        FROM stars s\n" +
-                    "        JOIN stars_in_movies sim ON s.id = sim.starId\n" +
-                    "        WHERE sim.movieId = m.id\n" +
-                    "        ORDER BY s.numMovies DESC\n" +
-                    "        LIMIT 3\n" +
-                    "    ) s\n" +
-                    ") AS three_stars\n" +
-                    "FROM movies m\n" +
-                    "JOIN ratings r ON r.movieId = m.id\n" +
-                    "JOIN genres_in_movies gim ON gim.movieId = m.id\n" +
-                    "JOIN genres g ON gim.genreId = g.id\n" +
-                    "JOIN stars_in_movies sim ON sim.movieId = m.id\n" +
-                    "JOIN stars s ON s.id = sim.starId\n" +
+                    "substring_index(GROUP_CONCAT(s.name, ':', s.id ORDER BY s.numMovies DESC SEPARATOR ','), ',', 3) as three_stars\n" +
+                    "    FROM movies m\n" +
+                    "    JOIN ratings r ON r.movieId = m.id\n" +
+                    "    JOIN genres_in_movies gim ON gim.movieId = m.id\n" +
+                    "    JOIN genres g ON gim.genreId = g.id\n" +
+                    "    JOIN stars_in_movies sim ON sim.movieId = m.id\n" +
+                    "    JOIN stars s ON s.id = sim.starId\n" +
                     "WHERE m.title LIKE ?";
-//            String query = "SELECT m.id, m.title, m.year, m.director, r.rating, \n" +
-//                    "    three_genres.three_genres,\n" +
-//                    "    three_stars.three_stars\n" +
-//                    "FROM movies m\n" +
-//                    "JOIN ratings r ON r.movieId = m.id\n" +
-//                    "JOIN (\n" +
-//                    "    SELECT gim.movieId, GROUP_CONCAT(g.name ORDER BY g.name ASC SEPARATOR ',') AS three_genres\n" +
-//                    "    FROM genres_in_movies gim\n" +
-//                    "    JOIN genres g ON gim.genreId = g.id\n" +
-//                    "    GROUP BY gim.movieId\n" +
-//                    ") AS three_genres ON three_genres.movieId = m.id\n" +
-//                    "JOIN (\n" +
-//                    "    SELECT sim.movieId, GROUP_CONCAT(CONCAT(s.name, ':', s.id) ORDER BY s.numMovies DESC SEPARATOR ',') AS three_stars\n" +
-//                    "    FROM stars_in_movies sim\n" +
-//                    "    JOIN stars s ON s.id = sim.starId\n" +
-//                    "    GROUP BY sim.movieId\n" +
-//                    ") AS three_stars ON three_stars.movieId = m.id\n" +
-//                    "JOIN stars s_main ON s_main.id = three_stars.three_stars -- Join stars table to filter\n" +
-//                    "WHERE m.title LIKE ?";
-//            String query = "SELECT m.id, m.title, m.year, m.director, r.rating, " +
-//                    "three_genres.three_genres, " +
-//                    "three_stars.three_stars " +
-//                    "FROM movies m " +
-//                    "JOIN ratings r ON r.movieId = m.id " +
-//                    "JOIN ( " +
-//                    "    SELECT gim.movieId, GROUP_CONCAT(g.name ORDER BY g.name ASC SEPARATOR ',') AS three_genres " +
-//                    "    FROM genres_in_movies gim " +
-//                    "    JOIN genres g ON gim.genreId = g.id " +
-//                    "    GROUP BY gim.movieId " +
-//                    ") AS three_genres ON three_genres.movieId = m.id " +
-//                    "JOIN ( " +
-//                    "    SELECT sim.movieId, GROUP_CONCAT(CONCAT(s.name, ':', s.id) ORDER BY s.numMovies DESC SEPARATOR ',') AS three_stars " +
-//                    "    FROM stars_in_movies sim " +
-//                    "    JOIN stars s ON s.id = sim.starId " +
-//                    "    GROUP BY sim.movieId " +
-//                    ") AS three_stars ON three_stars.movieId = m.id " +
-//                    "JOIN stars s_main ON FIND_IN_SET(s_main.id, REPLACE(three_stars.three_stars, ':', ',')) > 0 " +
-//                    "WHERE m.title LIKE ?";
 
             if (!searchYear.isEmpty()) { query += " AND m.year = ?";}
 
