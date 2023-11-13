@@ -37,7 +37,7 @@ function submitLoginForm(formSubmitEvent) {
     formSubmitEvent.preventDefault();
 
     jQuery.ajax(
-        "api/elogin", {
+        "elogin", {
             method: "POST",
             // Serialize the login form to the data sent by POST request
             data: login_form.serialize(),

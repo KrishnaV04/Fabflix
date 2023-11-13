@@ -14,7 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-@WebServlet(name = "EmployeeLoginServlet", urlPatterns = "/_dashboard/api/elogin")
+@WebServlet(name = "EmployeeLoginServlet", urlPatterns = "/_dashboard/elogin")
 public class EmployeeLoginServlet extends HttpServlet {
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -32,7 +32,7 @@ public class EmployeeLoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        System.out.println("-------------- dashboard access --------------");
+        System.out.println("-------------- employee dashboard accessed --------------");
         System.out.println(username);
         System.out.println(password);
 
@@ -89,3 +89,4 @@ public class EmployeeLoginServlet extends HttpServlet {
         }
     }
 }
+
