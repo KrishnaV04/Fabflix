@@ -26,13 +26,13 @@ CREATE TABLE IF NOT EXISTS stars_in_movies (
 );
 
 # Trigger helps maintain count of movies for stars
-CREATE TRIGGER updateMoviesCount AFTER INSERT ON stars_in_movies
-FOR EACH ROW
-BEGIN
-    UPDATE stars
-    SET numMovies = numMovies+1
-    WHERE id = NEW.starId;
-END;
+# CREATE TRIGGER updateMoviesCount AFTER INSERT ON stars_in_movies
+# FOR EACH ROW
+# BEGIN
+#     UPDATE stars
+#     SET numMovies = numMovies+1
+#     WHERE id = NEW.starId;
+# END;
 
 CREATE TABLE IF NOT EXISTS genres (
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -82,3 +82,13 @@ CREATE TABLE IF NOT EXISTS ratings (
     FOREIGN KEY (movieId) REFERENCES movies(id)
 );
 
+DELIMITER //
+
+CREATE PROCEDURE UpdateNumMoviesCount(IN star_id VARCHAR(10))
+BEGIN
+    UPDATE stars
+    SET numMovies = numMovies + 1
+    WHERE id = star_id;
+END//
+
+DELIMITER ;

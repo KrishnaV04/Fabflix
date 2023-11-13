@@ -26,28 +26,39 @@ public class SAXParserCasts extends DefaultHandler {
     private Star currStar;
     private CastMember currCastMember;
     private PreparedStatement starsInMoviesInsert;
+//    private static final String STARS_IN_MOVIES_INSERT_QUERY =
+//            "INSERT INTO stars_in_movies (starId, movieId) " +
+//                    "SELECT ?, ? " +
+//                    "FROM dual " +
+//                    "WHERE EXISTS (" +
+//                    "    SELECT 1 FROM stars " +
+//                    "    WHERE id = ?" +
+//                    ") AND EXISTS (" +
+//                    "    SELECT 1 FROM movies " +
+//                    "    WHERE id = ?" +
+//                    ") AND NOT EXISTS (" +
+//                    "    SELECT 1 FROM stars_in_movies " +
+//                    "    WHERE starId = ? AND movieId = ?" +
+//                    ")";
+
     private static final String STARS_IN_MOVIES_INSERT_QUERY =
             "INSERT INTO stars_in_movies (starId, movieId) " +
                     "SELECT ?, ? " +
                     "FROM dual " +
-                    "WHERE EXISTS (" +
-                    "    SELECT 1 FROM stars " +
-                    "    WHERE id = ?" +
-                    ") AND EXISTS (" +
-                    "    SELECT 1 FROM movies " +
-                    "    WHERE id = ?" +
-                    ") AND NOT EXISTS (" +
+                    "WHERE NOT EXISTS (" +
                     "    SELECT 1 FROM stars_in_movies " +
                     "    WHERE starId = ? AND movieId = ?" +
                     ")";
     private PreparedStatement starsInsert;
-    private static final String STAR_INSERT_QUERY = "INSERT INTO stars (id, name, birthYear) " +
-            "SELECT ?, ?, ? " +
-            "FROM dual " +
-            "WHERE NOT EXISTS (" +
-            "    SELECT 1 FROM stars " +
-            "    WHERE name = ?" +
-            ")";
+//    private static final String STAR_INSERT_QUERY = "INSERT INTO stars (id, name, birthYear) " +
+//            "SELECT ?, ?, ? " +
+//            "FROM dual " +
+//            "WHERE NOT EXISTS (" +
+//            "    SELECT 1 FROM stars " +
+//            "    WHERE name = ?" +
+//            ")";
+    private static final String STAR_INSERT_QUERY = "INSERT INTO stars (id, name, birthYear) VALUES (?, ?, ?)";
+    private static final String UPDATE_NUM_MOVIES_COUNT = "{call UpdateNumMoviesCount(?)}";
     private static final String XML_PATH = "src/stanford-movies/casts124.xml";
     private static final String DB_CLASS = "com.mysql.cj.jdbc.Driver";
     private static final String DB_URL = "jdbc:mysql://localhost:3306/moviedb";
@@ -82,23 +93,40 @@ public class SAXParserCasts extends DefaultHandler {
         }
     }
 
+//    private void insertIntoStarsInMoviesTable(CastMember castMember) {
+//        System.out.println("inserting a castMember: " + castMember.toString());
+//        try {
+//            starsInMoviesInsert.setString(1, castMember.getStarId());
+//            starsInMoviesInsert.setString(2, castMember.getMovieId());
+//            starsInMoviesInsert.setString(3, castMember.getStarId());
+//            starsInMoviesInsert.setString(4, castMember.getMovieId());
+//            starsInMoviesInsert.setString(5, castMember.getStarId());
+//            starsInMoviesInsert.setString(6, castMember.getMovieId());
+//            starsInMoviesInsert.addBatch();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
     private void insertIntoStarsInMoviesTable(CastMember castMember) {
-        System.out.println("inserting a castMember: " + castMember.toString());
+//        System.out.println("ACTUALLY inserting a castMember: " + castMember.toString());
         try {
             starsInMoviesInsert.setString(1, castMember.getStarId());
             starsInMoviesInsert.setString(2, castMember.getMovieId());
             starsInMoviesInsert.setString(3, castMember.getStarId());
             starsInMoviesInsert.setString(4, castMember.getMovieId());
-            starsInMoviesInsert.setString(5, castMember.getStarId());
-            starsInMoviesInsert.setString(6, castMember.getMovieId());
+    //        starsInMoviesInsert.setString(5, castMember.getStarId());
+    //        starsInMoviesInsert.setString(6, castMember.getMovieId());
             starsInMoviesInsert.addBatch();
+            CallableStatement cstmt = connection.prepareCall(UPDATE_NUM_MOVIES_COUNT);
+            cstmt.setString(1, castMember.getStarId());
+            cstmt.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     private void insertIntoStarsInMoviesTableIfNeeded(CastMember castMember) {
-        System.out.println("validating a castMember: " + castMember.toString());
+//        System.out.println("validating a castMember: " + castMember.toString());
         if (castMember.isValid() && stageNameToId.containsKey(castMember.getStarName()) && moviesFidToId.containsKey(castMember.getFid())) {
             castMember.setStarId(stageNameToId.get(castMember.getStarName()));
             castMember.setMovieId(moviesFidToId.get(castMember.getFid()));
@@ -109,7 +137,7 @@ public class SAXParserCasts extends DefaultHandler {
     }
 
     private void insertIntoStarsTable(Star star) {
-        System.out.println("inserting a star: " + star.toString());
+//        System.out.println("inserting a star: " + star.toString());
         try {
             if (star.isValid() && !stageNameToId.containsKey(star.getName()) && !Objects.equals(star.getName(), "sa")) {
                 this.starsInsert.setString(1, star.getId());
@@ -119,7 +147,7 @@ public class SAXParserCasts extends DefaultHandler {
                 } else {
                     this.starsInsert.setInt(3, star.getBirthYear());
                 }
-                this.starsInsert.setString(4, star.getName());
+//                this.starsInsert.setString(4, star.getName());
                 this.starsInsert.addBatch();
                 stageNameToId.put(star.getName(), star.getId());
             } else {
@@ -183,7 +211,9 @@ public class SAXParserCasts extends DefaultHandler {
         SAXParserActors spa = new SAXParserActors();
         SAXParserMovies spm = new SAXParserMovies();
         spa.run();
+//        System.out.println("SPA FIN");
         spm.run();
+//        System.out.println("SPM FIN");
         stageNameToId = spa.getStageNameToId();
         moviesFidToId = spm.getMoviesFidToId();
         nextStarId = spa.getStarId();
@@ -232,10 +262,9 @@ public class SAXParserCasts extends DefaultHandler {
             currStar.setName(tempVal);
             currCastMember.setStarName(tempVal);
             this.insertIntoStarsTable(this.currStar);
+            this.insertIntoStarsInMoviesTableIfNeeded(currCastMember);
         } else if (qName.equalsIgnoreCase("f")) {
             currCastMember.setFid(tempVal);
-        } else if (qName.equalsIgnoreCase("m")) {
-            this.insertIntoStarsInMoviesTableIfNeeded(currCastMember);
         }
     }
 
