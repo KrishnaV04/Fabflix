@@ -3,3 +3,7 @@
 target/
 .DS_Store
 /movie-data.sql
+/src/stanford-movies/
+/actors_inconsistencies.txt
+/casts_inconsistencies.txt
+/movies_inconsistencies.txt

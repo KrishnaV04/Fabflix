@@ -19,9 +19,6 @@ public class SAXParserCasts extends DefaultHandler {
     private Connection connection;
     private FileWriter inconsistenciesFileWriter;
     private BufferedWriter inconsistenciesBufferedWriter;
-
-    private FileWriter insertionsFileWriter;
-    private BufferedWriter insertionsBufferedWriter;
     private Map<String, String> moviesFidToId;
     private Map<String, String> stageNameToId;
     private String tempVal;
@@ -123,7 +120,6 @@ public class SAXParserCasts extends DefaultHandler {
             CallableStatement cstmt = connection.prepareCall(UPDATE_NUM_MOVIES_COUNT);
             cstmt.setString(1, castMember.getStarId());
             cstmt.execute();
-            this.addToInsertionsFile(castMember);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -166,19 +162,7 @@ public class SAXParserCasts extends DefaultHandler {
         try {
             inconsistenciesFileWriter = new FileWriter("casts_inconsistencies.txt");
             inconsistenciesBufferedWriter = new BufferedWriter(inconsistenciesFileWriter);
-            insertionsFileWriter = new FileWriter("insertions.txt");
-            insertionsBufferedWriter = new BufferedWriter(insertionsFileWriter);
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void addToInsertionsFile(CastMember castMember) {
-        try {
-            insertionsBufferedWriter.write(castMember.toString());
-            insertionsBufferedWriter.newLine();
-            insertionsBufferedWriter.flush();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }
