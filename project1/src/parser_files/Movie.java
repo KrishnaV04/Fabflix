@@ -1,3 +1,5 @@
+package parser_files;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,7 +80,7 @@ public class Movie {
 
     @Override
     public String toString() {
-        return "Movie ID: " + id + " Year: " + year + " Title: " + title + " Director: " + director + " Genres: " + genres;
+        return "parser_files.Movie ID: " + id + " Year: " + year + " Title: " + title + " Director: " + director + " Genres: " + genres;
     }
 
 }

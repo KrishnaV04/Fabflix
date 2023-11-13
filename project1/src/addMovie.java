@@ -60,7 +60,7 @@ public class addMovie extends HttpServlet {
                 // Perform the query
                 ResultSet rs = statement.executeQuery();
 
-                System.out.println("Movie Added Successfully.");
+                System.out.println("parser_files.Movie Added Successfully.");
             }
 
             JsonObject responseJson = new JsonObject();

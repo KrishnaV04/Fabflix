@@ -1,3 +1,5 @@
+package parser_files;
+
 public class Star {
     private String id = null;
     private String name = null;

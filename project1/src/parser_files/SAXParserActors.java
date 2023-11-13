@@ -1,3 +1,5 @@
+package parser_files;
+
 import java.io.IOException;
 import java.sql.*;
 
@@ -41,7 +43,7 @@ public class SAXParserActors extends DefaultHandler {
 
     private static final String MAX_STAR_ID_QUERY = "SELECT MAX(CAST(SUBSTRING(id, 3) AS SIGNED)) FROM stars";
 
-    private static final String XML_PATH = "src/stanford-movies/actors63.xml";
+    private static final String XML_PATH = "../project1/src/stanford-movies/actors63.xml";
 
     private static final String DB_CLASS = "com.mysql.cj.jdbc.Driver";
 
@@ -80,7 +82,7 @@ public class SAXParserActors extends DefaultHandler {
         }
     }
 
-//    private void insertIntoStarsTable(Star star) {
+//    private void insertIntoStarsTable(parser_files.Star star) {
 //        System.out.println("inserting a star: " + star.toString());
 //        try {
 //            if (star.isValid()) {

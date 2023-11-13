@@ -1,3 +1,5 @@
+package parser_files;
+
 public class CastMember {
     private String starName = null;
     private String starId = null;
@@ -42,6 +44,6 @@ public class CastMember {
 
     @Override
     public String toString() {
-        return "Star Name: " + starName  + " Star Id: " + starId + " FID: " + fid + " Movie Id: " + movieId;
+        return "parser_files.Star Name: " + starName  + " parser_files.Star Id: " + starId + " FID: " + fid + " parser_files.Movie Id: " + movieId;
     }
 }

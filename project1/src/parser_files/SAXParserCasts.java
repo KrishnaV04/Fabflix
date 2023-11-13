@@ -1,3 +1,5 @@
+package parser_files;
+
 import java.io.IOException;
 import java.sql.*;
 
@@ -59,7 +61,7 @@ public class SAXParserCasts extends DefaultHandler {
 //            ")";
     private static final String STAR_INSERT_QUERY = "INSERT INTO stars (id, name, birthYear) VALUES (?, ?, ?)";
     private static final String UPDATE_NUM_MOVIES_COUNT = "{call UpdateNumMoviesCount(?)}";
-    private static final String XML_PATH = "src/stanford-movies/casts124.xml";
+    private static final String XML_PATH = "../project1/src/stanford-movies/casts124.xml";
     private static final String DB_CLASS = "com.mysql.cj.jdbc.Driver";
     private static final String DB_URL = "jdbc:mysql://localhost:3306/moviedb";
     private static final String DB_USERNAME = "mytestuser";
@@ -93,7 +95,7 @@ public class SAXParserCasts extends DefaultHandler {
         }
     }
 
-//    private void insertIntoStarsInMoviesTable(CastMember castMember) {
+//    private void insertIntoStarsInMoviesTable(parser_files.CastMember castMember) {
 //        System.out.println("inserting a castMember: " + castMember.toString());
 //        try {
 //            starsInMoviesInsert.setString(1, castMember.getStarId());

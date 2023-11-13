@@ -69,7 +69,7 @@ public class addStar extends HttpServlet {
                 // Perform the query
                 ResultSet rs = statement.executeQuery();
 
-                System.out.println("Star Added Successfully.");
+                System.out.println("parser_files.Star Added Successfully.");
             }
 
             JsonObject responseJson = new JsonObject();

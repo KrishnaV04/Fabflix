@@ -1,3 +1,5 @@
+package parser_files;
+
 import java.io.IOException;
 import java.sql.*;
 
@@ -53,7 +55,7 @@ public class SAXParserMovies extends DefaultHandler {
 
     private static final String GENRES_IN_MOVIES_INSERT_QUERY = "INSERT IGNORE INTO genres_in_movies (genreId, movieId) VALUES ((SELECT id FROM genres WHERE name = ?), ?);";
 
-    private static final String XML_PATH = "src/stanford-movies/mains243.xml";
+    private static final String XML_PATH = "../project1/src/stanford-movies/mains243.xml";
 
     private static final String DB_CLASS = "com.mysql.cj.jdbc.Driver";
 
