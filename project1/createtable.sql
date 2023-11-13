@@ -3,6 +3,14 @@ CREATE DATABASE IF NOT EXISTS moviedb;
 
 USE moviedb;
 
+CREATE TABLE IF NOT EXISTS employees (
+    email varchar(50) primary key,
+    password varchar(20) not null,
+    fullname varchar(100)
+);
+
+INSERT INTO employees VALUES('classta@email.edu','classta','TA CS122B');
+
 CREATE TABLE IF NOT EXISTS movies (
     id VARCHAR(10) PRIMARY KEY,
     title VARCHAR(100) NOT NULL DEFAULT '',
@@ -81,6 +89,11 @@ CREATE TABLE IF NOT EXISTS ratings (
     PRIMARY KEY (movieId),
     FOREIGN KEY (movieId) REFERENCES movies(id)
 );
+
+CREATE TEMPORARY TABLE IF NOT EXISTS temp_star_counts AS
+SELECT starId, COUNT(*) as movieCount
+FROM stars_in_movies
+GROUP BY starId;
 
 DELIMITER //
 
