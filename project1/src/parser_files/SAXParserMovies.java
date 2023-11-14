@@ -64,6 +64,9 @@ public class SAXParserMovies extends DefaultHandler {
     private static final String DB_USERNAME = "mytestuser";
 
     private static final String DB_PASSWORD = "My6$Password";
+    private static final int BATCH_EXECUTION_SIZE = 250;
+    private int MOVIES_BATCH_SIZE = 0;
+    private int RATINGS_BATCH_SIZE = 0;
 
     public SAXParserMovies() {
         try {
@@ -219,6 +222,11 @@ public class SAXParserMovies extends DefaultHandler {
             ratingsInsert.setFloat(2, movie.getRating());
             ratingsInsert.setInt(3, 0);
             ratingsInsert.addBatch();
+            RATINGS_BATCH_SIZE += 1;
+            if (RATINGS_BATCH_SIZE % BATCH_EXECUTION_SIZE == 0) {
+                ratingsInsert.executeBatch();
+                RATINGS_BATCH_SIZE = 0;
+            }
         } catch(SQLException e){
             e.printStackTrace();
         }
@@ -243,6 +251,11 @@ public class SAXParserMovies extends DefaultHandler {
                 movieInsert.setInt(3, movie.getYear());
                 movieInsert.setString(4, movie.getDirector());
                 movieInsert.addBatch();
+                MOVIES_BATCH_SIZE += 1;
+                if (MOVIES_BATCH_SIZE % BATCH_EXECUTION_SIZE == 0) {
+                    movieInsert.executeBatch();
+                    MOVIES_BATCH_SIZE = 0;
+                }
                 moviesFidToId.put(movie.getFid(), movie.getId());
                 this.insertIntoRatingsTable(movie);
             } else {

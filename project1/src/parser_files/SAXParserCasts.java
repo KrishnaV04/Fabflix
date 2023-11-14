@@ -28,21 +28,6 @@ public class SAXParserCasts extends DefaultHandler {
     private Star currStar;
     private CastMember currCastMember;
     private PreparedStatement starsInMoviesInsert;
-//    private static final String STARS_IN_MOVIES_INSERT_QUERY =
-//            "INSERT INTO stars_in_movies (starId, movieId) " +
-//                    "SELECT ?, ? " +
-//                    "FROM dual " +
-//                    "WHERE EXISTS (" +
-//                    "    SELECT 1 FROM stars " +
-//                    "    WHERE id = ?" +
-//                    ") AND EXISTS (" +
-//                    "    SELECT 1 FROM movies " +
-//                    "    WHERE id = ?" +
-//                    ") AND NOT EXISTS (" +
-//                    "    SELECT 1 FROM stars_in_movies " +
-//                    "    WHERE starId = ? AND movieId = ?" +
-//                    ")";
-
     private static final String STARS_IN_MOVIES_INSERT_QUERY =
             "INSERT INTO stars_in_movies (starId, movieId) " +
                     "SELECT ?, ? " +
@@ -52,13 +37,6 @@ public class SAXParserCasts extends DefaultHandler {
                     "    WHERE starId = ? AND movieId = ?" +
                     ")";
     private PreparedStatement starsInsert;
-//    private static final String STAR_INSERT_QUERY = "INSERT INTO stars (id, name, birthYear) " +
-//            "SELECT ?, ?, ? " +
-//            "FROM dual " +
-//            "WHERE NOT EXISTS (" +
-//            "    SELECT 1 FROM stars " +
-//            "    WHERE name = ?" +
-//            ")";
     private static final String STAR_INSERT_QUERY = "INSERT INTO stars (id, name, birthYear) VALUES (?, ?, ?)";
     private static final String UPDATE_NUM_MOVIES_COUNT = "{call UpdateNumMoviesCount(?)}";
     private static final String XML_PATH = "../project1/src/stanford-movies/casts124.xml";
@@ -66,6 +44,8 @@ public class SAXParserCasts extends DefaultHandler {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/moviedb";
     private static final String DB_USERNAME = "mytestuser";
     private static final String DB_PASSWORD = "My6$Password";
+    private static final int BATCH_EXECUTION_SIZE = 1000;
+    private int STARS_IN_MOVIES_BATCH_SIZE = 0;
 
     public SAXParserCasts() {
         try {
@@ -95,20 +75,6 @@ public class SAXParserCasts extends DefaultHandler {
         }
     }
 
-//    private void insertIntoStarsInMoviesTable(parser_files.CastMember castMember) {
-//        System.out.println("inserting a castMember: " + castMember.toString());
-//        try {
-//            starsInMoviesInsert.setString(1, castMember.getStarId());
-//            starsInMoviesInsert.setString(2, castMember.getMovieId());
-//            starsInMoviesInsert.setString(3, castMember.getStarId());
-//            starsInMoviesInsert.setString(4, castMember.getMovieId());
-//            starsInMoviesInsert.setString(5, castMember.getStarId());
-//            starsInMoviesInsert.setString(6, castMember.getMovieId());
-//            starsInMoviesInsert.addBatch();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
     private void insertIntoStarsInMoviesTable(CastMember castMember) {
 //        System.out.println("ACTUALLY inserting a castMember: " + castMember.toString());
         try {
@@ -116,9 +82,13 @@ public class SAXParserCasts extends DefaultHandler {
             starsInMoviesInsert.setString(2, castMember.getMovieId());
             starsInMoviesInsert.setString(3, castMember.getStarId());
             starsInMoviesInsert.setString(4, castMember.getMovieId());
-    //        starsInMoviesInsert.setString(5, castMember.getStarId());
-    //        starsInMoviesInsert.setString(6, castMember.getMovieId());
             starsInMoviesInsert.addBatch();
+            STARS_IN_MOVIES_BATCH_SIZE += 1;
+            if (STARS_IN_MOVIES_BATCH_SIZE % BATCH_EXECUTION_SIZE == 0) {
+                starsInsert.executeBatch();
+                starsInMoviesInsert.executeBatch();
+                STARS_IN_MOVIES_BATCH_SIZE = 0;
+            }
             CallableStatement cstmt = connection.prepareCall(UPDATE_NUM_MOVIES_COUNT);
             cstmt.setString(1, castMember.getStarId());
             cstmt.execute();
@@ -149,8 +119,12 @@ public class SAXParserCasts extends DefaultHandler {
                 } else {
                     this.starsInsert.setInt(3, star.getBirthYear());
                 }
-//                this.starsInsert.setString(4, star.getName());
                 this.starsInsert.addBatch();
+//                STARS_BATCH_SIZE += 1;
+//                if (STARS_BATCH_SIZE % BATCH_EXECUTION_SIZE == 0) {
+//                    starsInsert.executeBatch();
+//                    STARS_BATCH_SIZE = 0;
+//                }
                 stageNameToId.put(star.getName(), star.getId());
             } else {
                 this.addToInconsistencyFile(star);
@@ -191,9 +165,11 @@ public class SAXParserCasts extends DefaultHandler {
 
     public void run() {
         try {
+            System.out.println("Cast Parsing Starting");
             this.parseMainAndActors();
             this.parseDocument();
             starsInsert.executeBatch();
+            System.out.println("Cast New Stars All Added");
             starsInMoviesInsert.executeBatch();
         } catch (Exception e) {
             e.printStackTrace();
@@ -213,9 +189,9 @@ public class SAXParserCasts extends DefaultHandler {
         SAXParserActors spa = new SAXParserActors();
         SAXParserMovies spm = new SAXParserMovies();
         spa.run();
-//        System.out.println("SPA FIN");
+        System.out.println("Actors Parsing Finished");
         spm.run();
-//        System.out.println("SPM FIN");
+        System.out.println("Movies Parsing Finished");
         stageNameToId = spa.getStageNameToId();
         moviesFidToId = spm.getMoviesFidToId();
         nextStarId = spa.getStarId();
@@ -273,5 +249,6 @@ public class SAXParserCasts extends DefaultHandler {
     public static void main(String[] args) {
         SAXParserCasts spc = new SAXParserCasts();
         spc.run();
+        System.out.println("Cast Parsing Finished");
     }
 }

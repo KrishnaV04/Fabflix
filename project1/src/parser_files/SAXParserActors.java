@@ -26,32 +26,15 @@ public class SAXParserActors extends DefaultHandler {
     private int nextStarId;
     private Star currStar;
     private PreparedStatement starInsert;
-
-//    private static final String STAR_INSERT_QUERY = "INSERT INTO stars (id, name, birthYear)\n" +
-//            "SELECT ?, ?, ?\n" +
-//            "FROM dual\n" +
-//            "WHERE NOT EXISTS (\n" +
-//            "    SELECT 1 FROM stars\n" +
-//            "    WHERE name = ?\n" +
-//            "    AND (\n" +
-//            "        (birthYear = ? AND ? IS NOT NULL)\n" +
-//            "        OR (birthYear IS NULL AND ? IS NULL)\n" +
-//            "    )\n" +
-//            ")\n";
-
     private static final String STAR_INSERT_QUERY = "INSERT INTO stars (id, name, birthYear) VALUES (?, ?, ?)";
-
     private static final String MAX_STAR_ID_QUERY = "SELECT MAX(CAST(SUBSTRING(id, 3) AS SIGNED)) FROM stars";
-
     private static final String XML_PATH = "../project1/src/stanford-movies/actors63.xml";
-
     private static final String DB_CLASS = "com.mysql.cj.jdbc.Driver";
-
     private static final String DB_URL = "jdbc:mysql://localhost:3306/moviedb";
-
     private static final String DB_USERNAME = "mytestuser";
-
     private static final String DB_PASSWORD = "My6$Password";
+    private static final int BATCH_EXECUTION_SIZE = 250;
+    private int STARS_BATCH_SIZE = 0;
 
     public SAXParserActors() {
         try {
@@ -122,6 +105,11 @@ public class SAXParserActors extends DefaultHandler {
                     starInsert.setInt(3, star.getBirthYear());
                 }
                 starInsert.addBatch();
+                STARS_BATCH_SIZE += 1;
+                if (STARS_BATCH_SIZE % BATCH_EXECUTION_SIZE == 0) {
+                    starInsert.executeBatch();
+                    STARS_BATCH_SIZE = 0;
+                }
                 stageNameToId.put(star.getName(), star.getId());
             } else {
                 this.addToInconsistencyFile(star);
