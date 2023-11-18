@@ -52,6 +52,7 @@ BEGIN
     SELECT id INTO p_genreId FROM genres WHERE name=p_genre LIMIT 1;
     SELECT id INTO p_starId FROM stars WHERE name=p_star LIMIT 1;
 
+    INSERT INTO ratings(movieId, rating, numVotes) VALUES (p_movieId, 0, 0);
     INSERT INTO genres_in_movies(genreId, movieId) VALUES (p_genreId, p_movieId);
     INSERT INTO stars_in_movies(starId, movieId) VALUES (p_starId, p_movieId);
 
