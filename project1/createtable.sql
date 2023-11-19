@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS movies (
     id VARCHAR(10) PRIMARY KEY,
     title VARCHAR(100) NOT NULL DEFAULT '',
     year INTEGER NOT NULL,
-    director VARCHAR(100) NOT NULL DEFAULT ''
+    director VARCHAR(100) NOT NULL DEFAULT '',
+    FULLTEXT idx (title)
 );
 
 CREATE TABLE IF NOT EXISTS stars (
@@ -32,15 +33,6 @@ CREATE TABLE IF NOT EXISTS stars_in_movies (
     FOREIGN KEY (starId) REFERENCES stars(id),
     FOREIGN KEY (movieId) REFERENCES movies(id)
 );
-
-# Trigger helps maintain count of movies for stars
-# CREATE TRIGGER updateMoviesCount AFTER INSERT ON stars_in_movies
-# FOR EACH ROW
-# BEGIN
-#     UPDATE stars
-#     SET numMovies = numMovies+1
-#     WHERE id = NEW.starId;
-# END;
 
 CREATE TABLE IF NOT EXISTS genres (
     id INTEGER PRIMARY KEY AUTO_INCREMENT,

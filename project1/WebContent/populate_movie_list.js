@@ -182,16 +182,34 @@ function makeAjaxCall() {
     console.log(url);
     window.history.pushState(null, null, url);
 
-    jQuery.ajax({
-        url: url,
-        method: 'GET',
-        success: function (data) {
-            populateMovieList(data);
-        },
-        error: function () {
-            console.error('Failed to retrieve movie data.');
-        }
-    });
+
+    let full_text_search = urlParams.get('search_text') !== null;
+    if (full_text_search) {
+        jQuery.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                console.log("IN FULL TEXT SEARCH populate_movie_list.js")
+                console.log(data);
+                console.log("END FULL TEXT SEARCH populate_movie_list.js data")
+                populateMovieList(data);
+            },
+            error: function () {
+                console.error('Failed to retrieve movie data.');
+            }
+        });
+    } else {
+        jQuery.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                populateMovieList(data);
+            },
+            error: function () {
+                console.error('Failed to retrieve movie data.');
+            }
+        });
+    }
 }
 
 makeAjaxCall();
