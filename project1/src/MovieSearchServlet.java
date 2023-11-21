@@ -69,7 +69,6 @@ public class MovieSearchServlet extends HttpServlet {
         String pageNumber = request.getParameter("page_number");
 
         String searchText = request.getParameter("search_text");
-
         if (searchText != null && !searchText.isEmpty()) {
             try (Connection conn = dataSource.getConnection()) {
                 String fullTextQuery = "SELECT m.id, m.title, m.year, m.director, r.rating,\n" +
