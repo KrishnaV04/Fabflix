@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <title>parser_files.Movie Search</title>
+        <link rel="stylesheet" href="highlight_auto_complete.css">
     </head>
     <body>
         <a href="index.html">Fabflix</a>
@@ -16,11 +17,12 @@
             <button type="button" id="search-button">Search</button>
         </form>
         <form id="full-text-search-form">
-            <input type="text" id="full-text-search" placeholder="Full-text Search">
+            <label for="full-text-search"></label><input type="text" id="full-text-search" placeholder="Full-text Search">
             <button type="button" id="full-text-search-button">Full-text Search</button>
         </form>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.11/jquery.autocomplete.min.js"></script>
         <script src="search.js"></script>
     </body>
 </html>
