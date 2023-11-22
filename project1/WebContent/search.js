@@ -61,7 +61,7 @@ function runFullTextSearch() {
         url: 'movieSearch',
         method: 'GET',
         data: {
-            search_text: searchText, // Pass full-text search parameter
+            search_text: searchText,
             order: 'title',
             title_sort: 'asc',
             rating_sort: 'desc',

@@ -18,10 +18,9 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name="MovieAutocompleteServlet", urlPatterns = "/movie-autocomplete-servlet")
+@WebServlet(name = "MovieAutocompleteServlet", urlPatterns = "/movie-autocomplete-servlet")
 public class MovieAutocompleteServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-
     private DataSource dataSource;
 
     public void init(ServletConfig config) {
@@ -36,8 +35,13 @@ public class MovieAutocompleteServlet extends HttpServlet {
         String query = request.getParameter("query");
         JsonArray jsonArray = new JsonArray();
 
-        if (query != null && !query.trim().isEmpty() && query.length() >= 3) {
-            List<MovieSuggestion> suggestions = getMovieSuggestions(query);
+        if (query != null && !query.trim().isEmpty()) {
+            List<MovieSuggestion> suggestions;
+            if (query.length() >= 8) {
+                suggestions = getFuzzySearchSuggestions(query);
+            } else {
+                suggestions = getFullTextSearchSuggestions(query);
+            }
 
             String json = convertToJson(suggestions);
             response.setContentType("application/json");
@@ -49,7 +53,41 @@ public class MovieAutocompleteServlet extends HttpServlet {
         }
     }
 
-    private List<MovieSuggestion> getMovieSuggestions(String query) {
+    private List<MovieSuggestion> getFuzzySearchSuggestions(String query) {
+        List<MovieSuggestion> suggestions = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection()) {
+            String sql = "SELECT id, title FROM movies WHERE MATCH (title) AGAINST (? IN BOOLEAN MODE) OR title LIKE ? OR edth(title, ?, ?) LIMIT 10";
+            try (PreparedStatement statement = conn.prepareStatement(sql)) {
+                String[] keywords = query.split("\\s+");
+
+                StringBuilder fullTextSearch = new StringBuilder();
+                for (String keyword : keywords) {
+                    fullTextSearch.append("+").append(keyword).append("* ");
+                }
+                statement.setString(1, fullTextSearch.toString());
+                statement.setString(2, "%" + query + "%"); // For SQL LIKE
+                statement.setString(3, query); // For edth
+                statement.setInt(4, 2); // Edit distance threshold
+
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        String title = resultSet.getString("title");
+                        String movieId = resultSet.getString("id");
+                        MovieSuggestion suggestion = new MovieSuggestion(movieId, title);
+                        suggestions.add(suggestion);
+                    }
+                }
+            }
+            System.out.println("IN FUZZY");
+            System.out.println(suggestions.size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return suggestions;
+    }
+
+    private List<MovieSuggestion> getFullTextSearchSuggestions(String query) {
         List<MovieSuggestion> suggestions = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection()) {
@@ -89,5 +127,4 @@ public class MovieAutocompleteServlet extends HttpServlet {
         }
         return jsonArray.toString();
     }
-
 }
