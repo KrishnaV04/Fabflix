@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Objects;
 
 import org.jasypt.util.password.StrongPasswordEncryptor;
 
@@ -40,14 +41,17 @@ public class LoginServlet extends HttpServlet {
 
         // Verify reCAPTCHA
         // Reloading reCAPTCHA not a requirement
-        try {
-            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
-        } catch (Exception e) {
-            System.out.println("EXCEPTION IN RECAPTCHA!");
-            responseJsonObject.addProperty("status", "fail");
-            responseJsonObject.addProperty("message", "Recaptcha Failed");
-            response.getWriter().write(responseJsonObject.toString());
-            return;
+
+        if(!Objects.equals(request.getParameter("mobile"), "TRUE")) {
+            try {
+                RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+            } catch (Exception e) {
+                System.out.println("EXCEPTION IN RECAPTCHA!");
+                responseJsonObject.addProperty("status", "fail");
+                responseJsonObject.addProperty("message", "Recaptcha Failed");
+                response.getWriter().write(responseJsonObject.toString());
+                return;
+            }
         }
 
         try (Connection conn = dataSource.getConnection()) {

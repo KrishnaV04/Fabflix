@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Servlet Filter implementation class LoginFilter
@@ -30,7 +31,7 @@ public class LoginFilter implements Filter {
         }
 
         // Redirect to login page if the "user" attribute doesn't exist in session
-        if (httpRequest.getSession().getAttribute("user") == null) {
+        if (httpRequest.getSession().getAttribute("user") == null && !Objects.equals(httpRequest.getParameter("mobile"), "TRUE")) {
             httpResponse.sendRedirect("login.html");
         } else {
             chain.doFilter(request, response);
