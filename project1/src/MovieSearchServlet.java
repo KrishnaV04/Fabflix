@@ -1,14 +1,12 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -18,7 +16,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Objects;
+
 
 /*
 MYSQL CODE FOR FUTURE:
@@ -69,71 +67,75 @@ public class MovieSearchServlet extends HttpServlet {
         String pageNumber = request.getParameter("page_number");
 
         String searchText = request.getParameter("search_text");
-
         if (searchText != null && !searchText.isEmpty()) {
             try (Connection conn = dataSource.getConnection()) {
-                String fullTextQuery = "SELECT m.id, m.title, m.year, m.director, r.rating,\n" +
-                        "(SELECT GROUP_CONCAT(g.name ORDER BY g.name ASC SEPARATOR ',') \n" +
-                        "        FROM genres_in_movies gim\n" +
-                        "        JOIN genres g ON gim.genreId = g.id\n" +
-                        "        WHERE gim.movieId = m.id\n" +
-                        "        LIMIT 3) AS three_genres,\n" +
-                        "substring_index(GROUP_CONCAT(s.name, ':', s.id ORDER BY s.numMovies DESC SEPARATOR ','), ',', 3) as three_stars\n" +
-                        "    FROM movies m\n" +
-                        "    JOIN ratings r ON r.movieId = m.id\n" +
-                        "    JOIN genres_in_movies gim ON gim.movieId = m.id\n" +
-                        "    JOIN genres g ON gim.genreId = g.id\n" +
-                        "    JOIN stars_in_movies sim ON sim.movieId = m.id\n" +
-                        "    JOIN stars s ON s.id = sim.starId\n" +
+                String fuzzySearchQuery = "SELECT m.id, m.title, m.year, m.director, r.rating, " +
+                        "(SELECT GROUP_CONCAT(g.name ORDER BY g.name ASC SEPARATOR ',') " +
+                        "FROM genres_in_movies gim " +
+                        "JOIN genres g ON gim.genreId = g.id " +
+                        "WHERE gim.movieId = m.id LIMIT 3) AS three_genres, " +
+                        "SUBSTRING_INDEX(GROUP_CONCAT(s.name, ':', s.id ORDER BY s.numMovies DESC SEPARATOR ','), ',', 3) AS three_stars " +
+                        "FROM movies m " +
+                        "JOIN ratings r ON r.movieId = m.id " +
+                        "JOIN genres_in_movies gim ON gim.movieId = m.id " +
+                        "JOIN genres g ON gim.genreId = g.id " +
+                        "JOIN stars_in_movies sim ON sim.movieId = m.id " +
+                        "JOIN stars s ON s.id = sim.starId " +
                         "WHERE MATCH(m.title) AGAINST(? IN BOOLEAN MODE) ";
 
-                String[] keywords = searchText.split("\\s+"); // Split keywords by space
+                if (searchText.length() >= 8) {
+                    fuzzySearchQuery += "OR m.title LIKE ? OR edth(m.title, ?, ?) ";
+                }
 
+                fuzzySearchQuery += "GROUP BY m.id, m.director, m.year, m.title, r.rating ";
+
+                if (("asc".equals(rating_sort) || "desc".equals(rating_sort)) && ("asc".equals(title_sort) || "desc".equals(title_sort))) {
+                    if ("title".equals(order)) {
+                        fuzzySearchQuery += "ORDER BY m.title " + title_sort + " , r.rating " + rating_sort;
+                    } else if ("rating".equals(order)) {
+                        fuzzySearchQuery += "ORDER BY r.rating " + rating_sort + " , m.title " + title_sort;
+                    }
+                }
+
+                fuzzySearchQuery += " LIMIT ? OFFSET ?;";
+
+                PreparedStatement fuzzySearchStatement = conn.prepareStatement(fuzzySearchQuery);
+                int parameterIndex = 1;
+
+                String[] keywords = searchText.split("\\s+");
                 StringBuilder fullTextSearch = new StringBuilder();
                 for (String keyword : keywords) {
                     fullTextSearch.append("+").append(keyword).append("* ");
                 }
 
-                fullTextQuery += "GROUP BY m.id, m.director, m.year, m.title, r.rating\n";
-
-                if (("asc".equals(rating_sort) || "desc".equals(rating_sort)) && ("asc".equals(title_sort) || "desc".equals(title_sort))) {
-                    if ("title".equals(order)) {
-                        fullTextQuery += "ORDER BY m.title " + title_sort + " , r.rating " + rating_sort;
-                    } else if("rating".equals(order)) {
-                        fullTextQuery += "ORDER BY r.rating " + rating_sort + " , m.title " + title_sort;
-                    }
+                fuzzySearchStatement.setString(parameterIndex++, fullTextSearch.toString());
+                if (searchText.length() >= 8) {
+                    fuzzySearchStatement.setString(parameterIndex++, "%" + searchText + "%"); // For SQL LIKE
+                    fuzzySearchStatement.setString(parameterIndex++, searchText); // For edth
+                    fuzzySearchStatement.setInt(parameterIndex++, 2); // Edit distance threshold
                 }
 
-                fullTextQuery += " LIMIT ? OFFSET ?;";
-
-                PreparedStatement fullTextStatement = conn.prepareStatement(fullTextQuery);
-                int parameterIndex = 1;
-
-                fullTextStatement.setString(parameterIndex++, fullTextSearch.toString());
-                // Set other parameters as needed
-
-                // Set LIMIT and OFFSET parameters
                 if (results_per_page == null) {
                     results_per_page = "10";
                 }
                 if (pageNumber == null) {
                     pageNumber = "0";
                 }
-                fullTextStatement.setInt(parameterIndex++, Integer.parseInt(results_per_page));
-                fullTextStatement.setInt(parameterIndex++, Integer.parseInt(results_per_page) * Integer.parseInt(pageNumber));
+                fuzzySearchStatement.setInt(parameterIndex++, Integer.parseInt(results_per_page));
+                fuzzySearchStatement.setInt(parameterIndex++, Integer.parseInt(results_per_page) * Integer.parseInt(pageNumber));
 
-                ResultSet fullTextResultSet = fullTextStatement.executeQuery();
+                ResultSet fuzzySearchResultSet = fuzzySearchStatement.executeQuery();
 
                 JsonArray fullTextMovieList = new JsonArray();
-                while (fullTextResultSet.next()) {
+                while (fuzzySearchResultSet.next()) {
                     JsonObject fullTextMovie = new JsonObject();
-                    fullTextMovie.addProperty("movie_id", fullTextResultSet.getString("id"));
-                    fullTextMovie.addProperty("movie_title", fullTextResultSet.getString("title"));
-                    fullTextMovie.addProperty("movie_year", fullTextResultSet.getInt("year"));
-                    fullTextMovie.addProperty("movie_director", fullTextResultSet.getString("director"));
-                    fullTextMovie.addProperty("movie_rating", fullTextResultSet.getDouble("rating"));
-                    fullTextMovie.addProperty("movie_genres", fullTextResultSet.getString("three_genres"));
-                    fullTextMovie.addProperty("movie_stars", fullTextResultSet.getString("three_stars"));
+                    fullTextMovie.addProperty("movie_id", fuzzySearchResultSet.getString("id"));
+                    fullTextMovie.addProperty("movie_title", fuzzySearchResultSet.getString("title"));
+                    fullTextMovie.addProperty("movie_year", fuzzySearchResultSet.getInt("year"));
+                    fullTextMovie.addProperty("movie_director", fuzzySearchResultSet.getString("director"));
+                    fullTextMovie.addProperty("movie_rating", fuzzySearchResultSet.getDouble("rating"));
+                    fullTextMovie.addProperty("movie_genres", fuzzySearchResultSet.getString("three_genres"));
+                    fullTextMovie.addProperty("movie_stars", fuzzySearchResultSet.getString("three_stars"));
                     fullTextMovieList.add(fullTextMovie);
                 }
 
@@ -142,8 +144,8 @@ public class MovieSearchServlet extends HttpServlet {
 
                 out.write(new Gson().toJson(fullTextJsonResponse));
 
-                fullTextResultSet.close();
-                fullTextStatement.close();
+                fuzzySearchResultSet.close();
+                fuzzySearchStatement.close();
             } catch (Exception e) {
                 e.printStackTrace();
                 JsonObject errorJson = new JsonObject();
