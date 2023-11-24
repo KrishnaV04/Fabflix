@@ -7,12 +7,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.attribute.UserPrincipalLookupService;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -51,6 +53,7 @@ public class MovieSearchServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.setContentType("application/json");
+        HttpSession session = request.getSession();
 
         PrintWriter out = response.getWriter();
 
@@ -67,7 +70,14 @@ public class MovieSearchServlet extends HttpServlet {
         String pageNumber = request.getParameter("page_number");
 
         String searchText = request.getParameter("search_text");
+        String session_searchText = (String) session.getAttribute("searchText");
+
+        if (session_searchText != null && (searchText == null || searchText.isEmpty())) {searchText = session_searchText;}
+
+
         if (searchText != null && !searchText.isEmpty()) {
+            session.setAttribute("searchText", searchText);
+
             try (Connection conn = dataSource.getConnection()) {
                 String fuzzySearchQuery = "SELECT m.id, m.title, m.year, m.director, r.rating, " +
                         "(SELECT GROUP_CONCAT(g.name ORDER BY g.name ASC SEPARATOR ',') " +
@@ -155,7 +165,8 @@ public class MovieSearchServlet extends HttpServlet {
             } finally {
                 out.close();
             }
-        } else {
+        } else if(searchYear != null){
+            //System.out.println("default behavior not full text"); // test
             try (Connection conn = dataSource.getConnection()) {
                 String query = "SELECT m.id, m.title, m.year, m.director, r.rating,\n" +
                         "(SELECT GROUP_CONCAT(g.name ORDER BY g.name ASC SEPARATOR ',') \n" +
