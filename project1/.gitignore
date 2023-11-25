@@ -4,3 +4,12 @@ target/
 .DS_Store
 /movie-data.sql
 stanford-movies
+
+# android gitignore
+android/*.iml
+android/.gradle
+android/local.properties
+android/.idea
+android/.DS_Store
+android/build
+android/captures
