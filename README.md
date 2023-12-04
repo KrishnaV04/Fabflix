@@ -5,8 +5,10 @@ Demo Video Link: [https://drive.google.com/file/d/1Df62oX5z2CUuJ3WXbUGNdP21DOdlY
 - Radhakrishna: Developing an Android App for Fabflix
   
 **JDBC Connection Pooling Information:**
+
 Location - /project1/WebContent/META-INF/content.xml
-Prepared Statement Locations:
+
+**Prepared Statement Locations:**
 - project1/src/EmployeeLoginServlet.java
 - project1/src/LoginServlet.java
 - project1/src/MovieAutocomplete.java
