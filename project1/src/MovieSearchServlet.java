@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.attribute.UserPrincipalLookupService;
@@ -52,6 +53,9 @@ public class MovieSearchServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        long servletStartTime = System.nanoTime();
+        long jdbcStartTime = 0;
+        long jdbcEndTime = 0;
         response.setContentType("application/json");
         HttpSession session = request.getSession();
 
@@ -134,7 +138,9 @@ public class MovieSearchServlet extends HttpServlet {
                 fuzzySearchStatement.setInt(parameterIndex++, Integer.parseInt(results_per_page));
                 fuzzySearchStatement.setInt(parameterIndex++, Integer.parseInt(results_per_page) * Integer.parseInt(pageNumber));
 
+                jdbcStartTime = System.nanoTime();
                 ResultSet fuzzySearchResultSet = fuzzySearchStatement.executeQuery();
+                jdbcEndTime = System.nanoTime();
 
                 JsonArray fullTextMovieList = new JsonArray();
                 while (fuzzySearchResultSet.next()) {
@@ -212,7 +218,9 @@ public class MovieSearchServlet extends HttpServlet {
                 statement.setInt(parameterIndex++, Integer.parseInt(results_per_page));
                 statement.setInt(parameterIndex++, Integer.parseInt(results_per_page) * Integer.parseInt(pageNumber));
 
+                jdbcStartTime = System.nanoTime();
                 ResultSet resultSet = statement.executeQuery();
+                jdbcEndTime = System.nanoTime();
 
                 JsonArray movieList = new JsonArray();
                 while (resultSet.next()) {
@@ -247,6 +255,18 @@ public class MovieSearchServlet extends HttpServlet {
             } finally {
                 out.close();
             }
+        }
+        long servletEndTime = System.nanoTime();
+        long jdbcElapsedTime = jdbcEndTime - jdbcStartTime;
+        long servletElapsedTime = servletEndTime - servletStartTime;
+        String logFilePath = "/home/ubuntu/logs/myLogFile.log";
+        try (PrintWriter logWriter = new PrintWriter(new FileWriter(logFilePath, true))) {
+            // Log JDBC elapsed time and servlet elapsed time
+            logWriter.println("JDBC Execution Time (nanoseconds), TJ: " + jdbcElapsedTime);
+            logWriter.println("Servlet Execution Time (nanoseconds), TS: " + servletElapsedTime);
+            logWriter.println("----------------------------------------");
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle or log the exception
         }
     }
 }
