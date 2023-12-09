@@ -5,8 +5,8 @@
     
     - #### Project 5 Video Demo Link: [https://drive.google.com/file/d/1Df62oX5z2CUuJ3WXbUGNdP21DOdlYQ8G/view?usp=sharing](https://drive.google.com/file/d/1Df62oX5z2CUuJ3WXbUGNdP21DOdlYQ8G/view?usp=sharing)
 
-    - #### Instruction of deployment: Clone the above repo, and run the createtable.sql storedprocedures.sql and movie-data.sql then execute the XML parser to
-    - parse through all data and store standford movie data onto the mysql database that must be avaialable on your computer. Then run ```mvn pacakge``` to build .war file and test out the website using the format ```http//<ip>:<port>/cs122b-project1-api-example/login.html``` note if you want to go to the load balancer and test our the master-slave replication use the load balancer ip address with the port ```80``` instead of the port ```8080```.
+    - #### Instruction of deployment:
+    - Clone the above repo, and run the createtable.sql storedprocedures.sql and movie-data.sql then execute the XML parser to parse through all data and store standford movie data onto the mysql database that must be avaialable on your computer. Then run ```mvn pacakge``` to build .war file and test out the website using the format ```http//<ip>:<port>/cs122b-project1-api-example/login.html``` note if you want to go to the load balancer and test our the master-slave replication use the load balancer ip address with the port ```80``` instead of the port ```8080```.
 
     - #### Collaborations and Work Distribution: Raymond - JMeter time Analysis Task 4 and Fabflix Scaling with LoadBalancer and MySQL; Radhakrishna - JDBC Connection Pooling, Master Slave Replication and LoadBalancer and Internal MySQL configuration
 
