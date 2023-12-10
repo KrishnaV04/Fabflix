@@ -64,4 +64,7 @@
 | Case 2: HTTP/10 threads                        | ![image6](project1/img/scaled-case-2.png)   | 121                        | 43.8831                             | 43.5584                   | ??           |
 | Case 3: HTTP/10 threads/No connection pooling  | ![image7](project1/img/scaled-case-3.png)   | 167                        | 56.4047                             | 56.1073                   | ??           |
 
+- ## Overall Report Remarks:
+- 
+
 
