@@ -35,8 +35,8 @@
 - # Master/Slave
     - #### Include the filename/path of all code/configuration files in GitHub of routing queries to Master/Slave SQL.
     - /project1/WebContent/META-INF/content.xml
-    - /project1/WebContent/META-INF/master_content.xml
-    - /project1/WebContent/META-INF/slave_content.xml
+    - /project1/master_content.xml
+    - /project1/slave_content.xml
 
     - #### How read/write requests were routed to Master/Slave SQL:
     - From the load balancer read requests can be sent to either the Master or the Slave, and when received the slave/master servers will use their content.xml to connect to their local database and execute the respective query. However in the instance that write requests are given to the master or the slave the master will continue to go to its local database using a connection from the connection pool if possible and the slave will connect to the master's database using the same concept however it is worth noting that the connection pools are seperate for both servers hence each one must make its own connection independent to the queries being sent to the other server.
@@ -54,13 +54,13 @@
 |------------------------------------------------|------------------------------|----------------------------|-------------------------------------|---------------------------|--------------|
 | Case 1: HTTP/1 thread                          | ![](path to image in img/)   | 92                         | 45.7272                             | 45.5265                   | ??           |
 | Case 2: HTTP/10 threads                        | ![](path to image in img/)   | 195                        | 117.9934                            | 117.8242                  | ??           |
-| Case 3: HTTPS/10 threads                       | ![](path to image in img/)   | 198                        | 119.9561                            | 119.9562                  | ??           |
+| Case 3: HTTPS/10 threads                       | ![](path to image in img/)   | 198                        | 120.1932                            | 119.9562                  | ??           |
 | Case 4: HTTP/10 threads/No connection pooling  | ![](path to image in img/)   | 177                        | 101.1257                            | 87.0488                   | ??           |
 
 | **Scaled Version Test Plan**                   | **Graph Results Screenshot** | **Average Query Time(ms)** | **Average Search Servlet Time(ms)** | **Average JDBC Time(ms)** | **Analysis** |
 |------------------------------------------------|------------------------------|----------------------------|-------------------------------------|---------------------------|--------------|
 | Case 1: HTTP/1 thread                          | ![](path to image in img/)   | 85                         | 7.4323                              | 7.2043                    | ??           |
 | Case 2: HTTP/10 threads                        | ![](path to image in img/)   | 121                        | 43.8831                             | 43.5584                   | ??           |
-| Case 3: HTTP/10 threads/No connection pooling  | ![](path to image in img/)   | ??                         | ??                                  | ??                        | ??           |
+| Case 3: HTTP/10 threads/No connection pooling  | ![](path to image in img/)   | 167                        | 56.4047                             | 56.1073                   | ??           |
 
 
