@@ -171,7 +171,7 @@ public class MovieSearchServlet extends HttpServlet {
             } finally {
                 out.close();
             }
-        } else if(searchYear != null){
+        } else if (searchYear != null) {
             //System.out.println("default behavior not full text"); // test
             try (Connection conn = dataSource.getConnection()) {
                 String query = "SELECT m.id, m.title, m.year, m.director, r.rating,\n" +
@@ -189,7 +189,9 @@ public class MovieSearchServlet extends HttpServlet {
                         "    JOIN stars s ON s.id = sim.starId\n" +
                         "WHERE m.title LIKE ?";
 
-                if (!searchYear.isEmpty()) { query += " AND m.year = ?";}
+                if (!searchYear.isEmpty()) {
+                    query += " AND m.year = ?";
+                }
 
                 query += " AND m.director LIKE ? AND s.name LIKE ?\n" +
                         "GROUP BY m.id, m.director, m.year, m.title, r.rating\n";
@@ -197,7 +199,7 @@ public class MovieSearchServlet extends HttpServlet {
                 if (("asc".equals(rating_sort) || "desc".equals(rating_sort)) && ("asc".equals(title_sort) || "desc".equals(title_sort))) {
                     if ("title".equals(order)) {
                         query += "ORDER BY m.title " + title_sort + " , r.rating " + rating_sort;
-                    } else if("rating".equals(order)) {
+                    } else if ("rating".equals(order)) {
                         query += "ORDER BY r.rating " + rating_sort + " , m.title " + title_sort;
                     }
                 }
@@ -208,13 +210,19 @@ public class MovieSearchServlet extends HttpServlet {
                 int parameterIndex = 1;
 
                 statement.setString(parameterIndex++, "%" + searchTitle + "%");
-                if (!searchYear.isEmpty()) {statement.setInt(parameterIndex++, Integer.parseInt(searchYear));}
+                if (!searchYear.isEmpty()) {
+                    statement.setInt(parameterIndex++, Integer.parseInt(searchYear));
+                }
                 statement.setString(parameterIndex++, "%" + searchDirector + "%");
                 statement.setString(parameterIndex++, "%" + searchStar + "%");
 
 
-                if (results_per_page == null) {results_per_page = "10";}
-                if (pageNumber == null) {pageNumber = "0";}
+                if (results_per_page == null) {
+                    results_per_page = "10";
+                }
+                if (pageNumber == null) {
+                    pageNumber = "0";
+                }
                 statement.setInt(parameterIndex++, Integer.parseInt(results_per_page));
                 statement.setInt(parameterIndex++, Integer.parseInt(results_per_page) * Integer.parseInt(pageNumber));
 
@@ -259,7 +267,7 @@ public class MovieSearchServlet extends HttpServlet {
         long servletEndTime = System.nanoTime();
         long jdbcElapsedTime = jdbcEndTime - jdbcStartTime;
         long servletElapsedTime = servletEndTime - servletStartTime;
-        String logFilePath = "/home/ubuntu/logs/myLogFile.log";
+        String logFilePath = "/Users/krishna_mac_pro/Desktop/UCI Sophomore/CS_122B/project_dirs/2023-fall-cs122b-mango/project1/myLogFile.txt";
         try (PrintWriter logWriter = new PrintWriter(new FileWriter(logFilePath, true))) {
             // Log JDBC elapsed time and servlet elapsed time
             logWriter.println("JDBC Execution Time (nanoseconds), TJ: " + jdbcElapsedTime);
@@ -269,4 +277,5 @@ public class MovieSearchServlet extends HttpServlet {
             e.printStackTrace(); // Handle or log the exception
         }
     }
+
 }
