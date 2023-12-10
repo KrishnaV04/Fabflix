@@ -44,8 +44,9 @@
 
 - # JMeter TS/TJ Time Logs
     - #### Instructions of how to use the `log_processing.*` script to process the JMeter logs:
-    - The log processing scrip is located at 2023-fall-cs122b-mango/project1/WebContent/logParser.py
-    - It processes the script by reading from the log file and calculating the averages for TS and TJ. To run it we can use python3 logParser.py in the directory to get to the parsed outputs. 
+    - The log processing scrip is located at 2023-fall-cs122b-mango/project1/logParser.py
+    - It processes the script by reading from the log file which gets created when server receives requests and calculates the averages for TS and TJ. To run it we can use python3 logParser.py in the directory to get to the parsed outputs.
+    - Note: all log files are located in the folder /project1/project5-logs/
 
 
 - # JMeter TS/TJ Time Measurement Report
