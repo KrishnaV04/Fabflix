@@ -65,6 +65,10 @@
 | Case 3: HTTP/10 threads/No connection pooling  | ![image7](project1/img/scaled-case-3.png)   | 167                        | 56.4047                             | 56.1073                   | ??           |
 
 - ## Overall Report Remarks:
-- 
+- In our project, we employed JMeter to conduct load testing on both our load balancer server and a conventional website server, employing distinct thread groups and utilizing varied protocols, including HTTP and HTTPS. It has come to my attention that, upon running JMeter at different instances, there is a notable variance in the collected data. This phenomenon is attributed to the inherent dynamism of the AWS instance, which, when subjected to varying loads or stresses, may influence the performance of our servers.
+
+- The output presented in the aforementioned tables is considered relatively accurate, bearing in mind the dynamic nature of the AWS infrastructure. However, it should be acknowledged that the data's absolute accuracy may be subject to fluctuations depending on the varying load conditions imposed on the AWS instance.
+
+- Additionally, an observation surfaced during the analysis phase, revealing a similarity in query times, as well as times associated (TS) and (TJ). Contrary to our initial expectations, where the incorporation of a load balancer and connection pooling was anticipated to yield significant improvements in processing speed, the observed marginal impact could be indicative of enhancements occurring on a smaller scale. This realization may elucidate the observed data patterns.
 
 
