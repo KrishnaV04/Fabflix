@@ -23,7 +23,7 @@
     -  #### project1/src/SingleMovieServlet.java
     -  #### project1/src/SingleStarServlet.java
 
-    - #### Connection Pooling Info: /project1/WebContent/META-INF/content.xml
+    - #### Connection Pooling Info: ```/project1/WebContent/META-INF/content.xml```
     
     - #### How Connection Pooling Works:
     - Connection pooling optimizes the utilization of connection resources to our MySQL server by efficiently reusing existing connections. This approach minimizes the processing time required for establishing entirely new connections. In our codebase, every servlet utilizing JDBC to interact with the database relies on the resource configuration specified in the context.xml file to establish connections. The content file, located at the specified path, contains details confirming the successful reuse of connections within our application.
@@ -34,9 +34,9 @@
 
 - # Master/Slave
     - #### Include the filename/path of all code/configuration files in GitHub of routing queries to Master/Slave SQL.
-    - /project1/WebContent/META-INF/content.xml
-    - /project1/master_content.xml
-    - /project1/slave_content.xml
+    - ```/project1/WebContent/META-INF/content.xml```
+    - ```/project1/master_content.xml```
+    - ```/project1/slave_content.xml```
 
     - #### How read/write requests were routed to Master/Slave SQL:
     - From the load balancer read requests can be sent to either the Master or the Slave, and when received the slave/master servers will use their content.xml to connect to their local database and execute the respective query. However in the instance that write requests are given to the master or the slave the master will continue to go to its local database using a connection from the connection pool if possible and the slave will connect to the master's database using the same concept however it is worth noting that the connection pools are seperate for both servers hence each one must make its own connection independent to the queries being sent to the other server.
@@ -46,7 +46,7 @@
     - #### Instructions of how to use the `log_processing.*` script to process the JMeter logs:
     - The log processing scrip is located at 2023-fall-cs122b-mango/project1/logParser.py
     - It processes the script by reading from the log file which gets created when server receives requests and calculates the averages for TS and TJ. To run it we can use python3 logParser.py in the directory to get to the parsed outputs.
-    - Note: all log files are located in the folder /project1/project5-logs/
+    - Note: all log files are located in the folder ```/project1/project5-logs/```
 
 
 - # JMeter TS/TJ Time Measurement Report
